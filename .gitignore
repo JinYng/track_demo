@@ -53,3 +53,31 @@ coverage/
 # Temporary folders
 tmp/
 temp/
+# Monorepo specific
+packages/*/dist/
+services/*/dist/
+apps/*/dist/
+
+# Docker
+.dockerignore
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads
+uploads/
+data/
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Testing
+.nyc_output/
+coverage/
+
+# Misc
+*.tgz
+*.tar.gz

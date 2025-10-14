@@ -1,0 +1,35 @@
+{
+  "name": "@ai-genomics/frontend",
+  "version": "1.0.0",
+  "description": "AI Genomics Assistant Frontend",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "clean": "rm -rf dist node_modules"
+  },
+  "dependencies": {
+    "@fontsource/roboto": "^5.0.2",
+    "@jbrowse/core": "^3.0.0",
+    "@jbrowse/react-app2": "^3.0.0",
+    "@ai-genomics/shared": "file:../../packages/shared",
+    "@ai-genomics/types": "file:../../packages/types",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "axios": "^1.6.0",
+    "react-router-dom": "^6.20.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^4.2.1",
+    "buffer": "^6.0.3",
+    "vite": "^6.0.0",
+    "eslint": "^9.13.0",
+    "typescript-eslint": "^8.11.0"
+  }
+}
