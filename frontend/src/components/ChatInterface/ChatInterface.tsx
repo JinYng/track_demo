@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { ModelConfiguration } from './ModelConfiguration'
-import { ChatHistory } from './ChatHistory'
-import { UserInput } from './UserInput'
-import { Message } from './MessageBubble'
+import { ModelConfiguration } from '../ModelConfiguration'
+import { ChatHistory } from '../ChatHistory'
+import { UserInput } from '../UserInput'
+import { Message } from '../MessageBubble'
+import './ChatInterface.css'
 
 interface ModelConfig {
   apiBaseUrl: string
@@ -18,7 +19,7 @@ export function ChatInterface({ viewState }: ChatInterfaceProps) {
   const [modelConfig, setModelConfig] = useState<ModelConfig>({
     apiBaseUrl: 'https://api.openai.com/v1',
     apiKey: '',
-    modelName: 'gpt-4'
+    modelName: 'gpt-4',
   })
 
   const [messages, setMessages] = useState<Message[]>([])
@@ -30,9 +31,9 @@ export function ChatInterface({ viewState }: ChatInterfaceProps) {
       id: Date.now().toString(),
       content,
       sender: 'user',
-      timestamp: new Date()
+      timestamp: new Date(),
     }
-    
+
     setMessages(prev => [...prev, userMessage])
     setIsLoading(true)
 
@@ -44,7 +45,7 @@ export function ChatInterface({ viewState }: ChatInterfaceProps) {
           id: (Date.now() + 1).toString(),
           content: `我收到了您的问题："${content}"。目前我正在开发中，很快就能为您提供基因组学分析服务！`,
           sender: 'ai',
-          timestamp: new Date()
+          timestamp: new Date(),
         }
         setMessages(prev => [...prev, aiMessage])
         setIsLoading(false)
@@ -56,16 +57,9 @@ export function ChatInterface({ viewState }: ChatInterfaceProps) {
   }
 
   return (
-    <div 
-      style={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: '#ffffff'
-      }}
-    >
+    <div className="chat-interface">
       {/* 模型配置组件 */}
-      <ModelConfiguration 
+      <ModelConfiguration
         config={modelConfig}
         onConfigChange={setModelConfig}
       />
@@ -74,10 +68,7 @@ export function ChatInterface({ viewState }: ChatInterfaceProps) {
       <ChatHistory messages={messages} />
 
       {/* 用户输入组件 */}
-      <UserInput 
-        onSendMessage={handleSendMessage}
-        disabled={isLoading}
-      />
+      <UserInput onSendMessage={handleSendMessage} disabled={isLoading} />
     </div>
   )
 }

@@ -1,0 +1,36 @@
+.split-layout {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.split-layout__left-panel {
+  height: 100%;
+  overflow: hidden;
+  border-right: 1px solid #e0e0e0;
+}
+
+.split-layout__right-panel {
+  height: 100%;
+  overflow: hidden;
+}
+
+.split-layout__divider {
+  width: 4px;
+  height: 100%;
+  background-color: #f0f0f0;
+  cursor: col-resize;
+  border-left: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+  transition: background-color 0.2s;
+}
+
+.split-layout__divider:hover {
+  background-color: #d0d0d0;
+}
+
+.split-layout__divider--dragging {
+  background-color: #d0d0d0;
+  transition: none;
+}
