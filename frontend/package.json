@@ -1,35 +1,38 @@
 {
-  "name": "@ai-genomics/frontend",
-  "version": "1.0.0",
-  "description": "AI Genomics Assistant Frontend",
+  "name": "vite-jbrowse-react-app",
   "type": "module",
-  "private": true,
+  "version": "0.0.0",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "clean": "rm -rf dist node_modules"
+    "predeploy": "npm run build",
+    "deploy": "aws s3 sync --delete dist s3://jbrowse.org/demos/app-vite/",
+    "postdeploy": "AWS_PAGER=\"\" aws cloudfront  create-invalidation --distribution-id E13LGELJOT4GQO --paths \"/demos/app-vite/*\"",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@fontsource/roboto": "^5.0.2",
     "@jbrowse/core": "^3.0.0",
     "@jbrowse/react-app2": "^3.0.0",
-    "@ai-genomics/shared": "file:../../packages/shared",
-    "@ai-genomics/types": "file:../../packages/types",
+    "@types/node": "^20.10.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "axios": "^1.6.0",
-    "react-router-dom": "^6.20.0"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.13.0",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.2.1",
     "buffer": "^6.0.3",
-    "vite": "^6.0.0",
     "eslint": "^9.13.0",
-    "typescript-eslint": "^8.11.0"
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.14",
+    "globals": "^16.0.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.3.3",
+    "typescript-eslint": "^8.11.0",
+    "vite": "^6.0.0"
   }
 }

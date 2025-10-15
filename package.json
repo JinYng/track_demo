@@ -4,31 +4,19 @@
   "description": "AI-powered genomics analysis assistant with JBrowse 2 integration",
   "private": true,
   "workspaces": [
-    "packages/*",
-    "apps/frontend"
+    "frontend",
+    "backend"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=@ai-genomics/frontend\" \"cd apps/backend && poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000\"",
-    "dev:frontend": "npm run dev --workspace=@ai-genomics/frontend",
-    "dev:backend": "cd apps/backend && poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
-    "build": "npm run build --workspaces",
-    "build:frontend": "npm run build --workspace=@ai-genomics/frontend",
-    "build:backend": "npm run build --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present",
-    "lint:fix": "npm run lint:fix --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present",
-    "clean": "npm run clean --workspaces --if-present && rm -rf node_modules",
-    "dev:db": "docker-compose -f docker-compose.dev.yml up -d",
-    "dev:db:down": "docker-compose -f docker-compose.dev.yml down",
-    "docker:build": "docker-compose build",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f"
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && pip install -r requirements.txt",
+    "build:frontend": "cd frontend && npm run build",
+    "lint": "cd frontend && npm run lint",
+    "setup": "npm run install:all"
   },
   "devDependencies": {
-    "@types/node": "^20.10.4",
     "concurrently": "^8.2.2",
-    "prettier": "^3.2.5",
     "typescript": "^5.3.3"
   },
   "engines": {
