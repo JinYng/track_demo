@@ -1,46 +1,20 @@
-import { useState, useEffect } from 'react'
-import { createViewState, JBrowseApp } from '@jbrowse/react-app2'
-// @ts-expect-error no font types
-import '@fontsource/roboto'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { ThemeProvider } from './contexts/ThemeContext'
+import DashboardPage from './pages/DashboardPage'
+import WorkspacePage from './pages/WorkspacePage'
+import './i18n'
 
-import config from './config'
-import { SplitLayout, ChatInterface } from './components'
-
-type ViewModel = ReturnType<typeof createViewState>
-
-function View() {
-  const [viewState, setViewState] = useState<ViewModel>()
-
-  useEffect(() => {
-    const state = createViewState({
-      config: {
-        ...config,
-      },
-    })
-    setViewState(state)
-  }, [])
-
-  if (!viewState) {
-    return <div>Loading JBrowse...</div>
-  }
-
+function App() {
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <header style={{ padding: '1rem', borderBottom: '1px solid #ccc' }}>
-        <h1>AI Genomics Assistant</h1>
-      </header>
-
-      <SplitLayout
-        leftPanel={<ChatInterface viewState={viewState} />}
-        rightPanel={
-          <div style={{ height: '100%' }}>
-            <JBrowseApp viewState={viewState} />
-          </div>
-        }
-        defaultSplitPercentage={40}
-      />
-    </div>
+    <ThemeProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/workspace/:sessionId" element={<WorkspacePage />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
   )
 }
 
-export default View
+export default App
