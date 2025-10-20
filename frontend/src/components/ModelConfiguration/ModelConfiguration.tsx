@@ -7,26 +7,53 @@ interface ModelConfig {
   modelName: string
 }
 
+type ConnectionStatus = 'idle' | 'testing' | 'success' | 'error'
+
 interface ModelConfigurationProps {
   config: ModelConfig
   onConfigChange: (config: ModelConfig) => void
+  onTestConnection?: (config: ModelConfig) => Promise<boolean>
+  connectionStatus?: ConnectionStatus
 }
 
 export function ModelConfiguration({
   config,
   onConfigChange,
+  onTestConnection,
+  connectionStatus = 'idle',
 }: ModelConfigurationProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [tempConfig, setTempConfig] = useState<ModelConfig>(config)
 
-  const handleSave = () => {
+  const handleSave = async () => {
     onConfigChange(tempConfig)
+
+    // 自动测试连接
+    if (onTestConnection) {
+      await onTestConnection(tempConfig)
+    }
+
     setIsModalOpen(false)
   }
 
   const handleCancel = () => {
     setTempConfig(config) // 重置为原始配置
     setIsModalOpen(false)
+  }
+
+  const getStatusText = (status: ConnectionStatus): string => {
+    switch (status) {
+      case 'idle':
+        return '未测试'
+      case 'testing':
+        return '测试中...'
+      case 'success':
+        return '连接成功'
+      case 'error':
+        return '连接失败'
+      default:
+        return '未知状态'
+    }
   }
 
   return (
@@ -42,7 +69,13 @@ export function ModelConfiguration({
             {config.modelName || '未配置'}
           </div>
         </div>
-        <div className="model-config__icon">设置</div>
+        <div className="model-config__status">
+          <div
+            className={`model-config__indicator model-config__indicator--${connectionStatus}`}
+            title={getStatusText(connectionStatus)}
+          />
+          <div className="model-config__icon">设置</div>
+        </div>
       </div>
 
       {/* 配置模态框 */}

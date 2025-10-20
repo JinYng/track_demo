@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "vite",
+    "dev": "CHOKIDAR_USEPOLLING=true vite",
+    "dev:normal": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "predeploy": "npm run build",
@@ -18,7 +19,8 @@
     "@jbrowse/react-app2": "^3.0.0",
     "@types/node": "^20.10.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

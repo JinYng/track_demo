@@ -37,6 +37,115 @@
   margin-bottom: 4px;
 }
 
+/* Markdown样式 */
+.message-bubble__text h1,
+.message-bubble__text h2,
+.message-bubble__text h3,
+.message-bubble__text h4,
+.message-bubble__text h5,
+.message-bubble__text h6 {
+  margin: 8px 0 4px 0;
+  font-weight: 600;
+}
+
+.message-bubble__text h1 { font-size: 1.2em; }
+.message-bubble__text h2 { font-size: 1.1em; }
+.message-bubble__text h3 { font-size: 1.05em; }
+
+.message-bubble__text p {
+  margin: 4px 0;
+}
+
+.message-bubble__text ul,
+.message-bubble__text ol {
+  margin: 4px 0;
+  padding-left: 16px;
+}
+
+.message-bubble__text li {
+  margin: 2px 0;
+}
+
+.message-bubble__text code {
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.message-bubble--user .message-bubble__text code {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.message-bubble__text pre {
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 8px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+
+.message-bubble--user .message-bubble__text pre {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.message-bubble__text pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.message-bubble__text blockquote {
+  border-left: 3px solid rgba(0, 0, 0, 0.2);
+  margin: 8px 0;
+  padding-left: 12px;
+  font-style: italic;
+}
+
+.message-bubble--user .message-bubble__text blockquote {
+  border-left-color: rgba(255, 255, 255, 0.4);
+}
+
+.message-bubble__text strong {
+  font-weight: 600;
+}
+
+.message-bubble__text em {
+  font-style: italic;
+}
+
+.message-bubble__text a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.message-bubble__text table {
+  border-collapse: collapse;
+  margin: 8px 0;
+  width: 100%;
+}
+
+.message-bubble__text th,
+.message-bubble__text td {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  padding: 4px 8px;
+  text-align: left;
+}
+
+.message-bubble--user .message-bubble__text th,
+.message-bubble--user .message-bubble__text td {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.message-bubble__text th {
+  background-color: rgba(0, 0, 0, 0.1);
+  font-weight: 600;
+}
+
+.message-bubble--user .message-bubble__text th {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
 .message-bubble__timestamp {
   font-size: 11px;
   opacity: 0.7;

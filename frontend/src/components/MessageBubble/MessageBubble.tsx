@@ -1,3 +1,4 @@
+import ReactMarkdown from 'react-markdown'
 import './MessageBubble.css'
 
 interface Message {
@@ -19,7 +20,9 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       className={`message-bubble ${isUser ? 'message-bubble--user' : 'message-bubble--ai'}`}
     >
       <div className="message-bubble__content">
-        <div className="message-bubble__text">{message.content}</div>
+        <div className="message-bubble__text">
+          <ReactMarkdown>{message.content}</ReactMarkdown>
+        </div>
         <div className="message-bubble__timestamp">
           {message.timestamp.toLocaleTimeString([], {
             hour: '2-digit',
