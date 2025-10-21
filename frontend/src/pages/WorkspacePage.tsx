@@ -1,20 +1,32 @@
 import { useParams } from 'react-router-dom'
 import { useTheme } from '../contexts/ThemeContext'
+import { useSession, SessionProvider, defaultSessionConfig, SessionConfig } from '../contexts/SessionContext'
+import { ChatInterface } from '../components/ChatInterface'
+import { GenomeBrowser } from '../components/GenomeBrowser'
+import { SplitLayout } from '../components/SplitLayout'
 
-export default function WorkspacePage() {
+/**
+ * WorkspacePageContent 组件
+ * 实际的工作区内容，使用SessionProvider提供的上下文
+ */
+function WorkspacePageContent() {
   const { sessionId } = useParams<{ sessionId: string }>()
   const { theme } = useTheme()
+  const { config } = useSession()
 
   return (
     <div
       style={{
-        minHeight: '100vh',
+        height: '100%',
+        flex: 1,
         backgroundColor: theme.colors.background,
         color: theme.colors.text,
         fontFamily: theme.fonts.primary,
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
-      {/* 顶部导航 */}
+      {/* 顶部导航栏 */}
       <header
         style={{
           padding: theme.spacing.md,
@@ -41,7 +53,7 @@ export default function WorkspacePage() {
           </div>
           <span style={{ color: theme.colors.secondaryText }}>{'>'}</span>
           <span style={{ fontSize: theme.fontSizes.body }}>
-            Session {sessionId} (Human - hg38)
+            {config.name} ({config.organism} - {config.referenceGenome})
           </span>
         </div>
         <div style={{ display: 'flex', gap: theme.spacing.md }}>
@@ -81,234 +93,63 @@ export default function WorkspacePage() {
         </div>
       </header>
 
-      {/* 主要工作区 */}
-      <div style={{ display: 'flex', height: 'calc(100vh - 60px)' }}>
-        {/* AI 助手面板 */}
-        <div
-          style={{
-            width: '400px',
-            borderRight: `1px solid ${theme.colors.border}`,
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          {/* AI 助手标题 */}
-          <div
-            style={{
-              padding: theme.spacing.md,
-              borderBottom: `1px solid ${theme.colors.border}`,
-            }}
-          >
-            <h3
-              style={{
-                fontSize: theme.fontSizes.h3,
-                fontWeight: theme.fontWeights.bold,
-                margin: 0,
-              }}
-            >
-              AI Assistant
-            </h3>
-          </div>
-
-          {/* 聊天区域 */}
-          <div
-            style={{
-              flex: 1,
-              padding: theme.spacing.md,
-              overflowY: 'auto',
-            }}
-          >
-            <div style={{ marginBottom: theme.spacing.md }}>
-              <div
-                style={{
-                  textAlign: 'right',
-                  marginBottom: theme.spacing.sm,
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: theme.fontSizes.body,
-                    color: theme.colors.text,
-                  }}
-                >
-                  User: Show me TP53 gene.
-                </span>
-              </div>
-              <div>
-                <span
-                  style={{
-                    fontSize: theme.fontSizes.body,
-                    color: theme.colors.text,
-                  }}
-                >
-                  AI: Navigating. I have highlighted all pathogenic variants
-                  from ClinVar in the{' '}
-                  <span
-                    style={{
-                      backgroundColor: '#E8F0FE',
-                      color: theme.colors.primary,
-                      padding: '2px 6px',
-                      borderRadius: '12px',
-                      fontSize: theme.fontSizes.caption,
-                    }}
-                  >
-                    TP53
-                  </span>{' '}
-                  region.
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* 输入区域 */}
-          <div
-            style={{
-              padding: theme.spacing.md,
-              borderTop: `1px solid ${theme.colors.border}`,
-            }}
-          >
-            <div style={{ display: 'flex', gap: theme.spacing.sm }}>
-              <input
-                type="text"
-                placeholder="Ask AI anything..."
-                style={{
-                  flex: 1,
-                  padding: theme.spacing.sm,
-                  border: `1px solid ${theme.colors.border}`,
-                  borderRadius: '4px',
-                  fontSize: theme.fontSizes.body,
-                  backgroundColor: theme.colors.background,
-                  color: theme.colors.text,
-                }}
-              />
-              <button
-                style={{
-                  padding: `${theme.spacing.sm} ${theme.spacing.md}`,
-                  border: 'none',
-                  backgroundColor: theme.colors.primary,
-                  color: 'white',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: theme.fontSizes.body,
-                }}
-              >
-                Send
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* 基因组浏览器区域 */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          {/* 浏览器控制栏 */}
-          <div
-            style={{
-              padding: theme.spacing.md,
-              borderBottom: `1px solid ${theme.colors.border}`,
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: theme.spacing.sm,
-              }}
-            >
-              <button
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  fontSize: theme.fontSizes.body,
-                  cursor: 'pointer',
-                  color: theme.colors.text,
-                }}
-              >
-                {'<'}
-              </button>
-              <button
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  fontSize: theme.fontSizes.body,
-                  cursor: 'pointer',
-                  color: theme.colors.text,
-                }}
-              >
-                {'>'}
-              </button>
-              <button
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  fontSize: theme.fontSizes.body,
-                  cursor: 'pointer',
-                  color: theme.colors.text,
-                }}
-              >
-                +
-              </button>
-              <button
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  fontSize: theme.fontSizes.body,
-                  cursor: 'pointer',
-                  color: theme.colors.text,
-                }}
-              >
-                -
-              </button>
-              <span
-                style={{
-                  fontSize: theme.fontSizes.body,
-                  color: theme.colors.text,
-                  marginLeft: theme.spacing.md,
-                }}
-              >
-                chr17:7,661,779-7,687,550
-              </span>
-            </div>
-            <button
-              style={{
-                background: 'none',
-                border: 'none',
-                color: theme.colors.primary,
-                fontSize: theme.fontSizes.body,
-                cursor: 'pointer',
-              }}
-            >
-              Tracks
-            </button>
-          </div>
-
-          {/* JBrowse 视图区域 */}
-          <div
-            style={{
-              flex: 1,
-              backgroundColor: theme.colors.surface,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <div
-              style={{
-                fontSize: theme.fontSizes.h3,
-                color: theme.colors.secondaryText,
-              }}
-            >
-              JBrowse Genome Browser
-              <br />
-              <span style={{ fontSize: theme.fontSizes.body }}>
-                (Integration in progress)
-              </span>
-            </div>
-          </div>
-        </div>
+      {/* 主工作区：使用SplitLayout分屏 */}
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+        <SplitLayout
+          defaultSplitPercentage={40}
+          leftPanel={
+            // 左侧: AI助手 (复用现有ChatInterface组件)
+            <ChatInterface viewState={null} />
+          }
+          rightPanel={
+            // 右侧: 基因组浏览器 (新的GenomeBrowser组件)
+            <GenomeBrowser sessionId={sessionId!} />
+          }
+        />
       </div>
     </div>
+  )
+}
+
+/**
+ * WorkspacePage 组件
+ * 应用工作区页面
+ * 使用SessionProvider包装以提供会话上下文
+ */
+export default function WorkspacePage() {
+  const { sessionId } = useParams<{ sessionId: string }>()
+
+  // 从sessionStorage读取已保存的会话配置，如果没有则使用默认配置
+  let initialConfig: SessionConfig = defaultSessionConfig
+  if (sessionId) {
+    try {
+      const savedConfig = sessionStorage.getItem(`session_${sessionId}`)
+      if (savedConfig) {
+        initialConfig = {
+          ...JSON.parse(savedConfig),
+          sessionId: sessionId,
+        }
+      } else {
+        // 如果没有保存的配置，使用默认值但设置sessionId
+        initialConfig = {
+          ...defaultSessionConfig,
+          sessionId: sessionId,
+          name: `Session ${sessionId}`,
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load session config:', error)
+      // 如果解析失败，使用默认配置
+      initialConfig = {
+        ...defaultSessionConfig,
+        sessionId: sessionId || 'default',
+      }
+    }
+  }
+
+  return (
+    <SessionProvider initialConfig={initialConfig}>
+      <WorkspacePageContent />
+    </SessionProvider>
   )
 }

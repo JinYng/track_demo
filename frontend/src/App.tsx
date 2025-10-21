@@ -8,10 +8,12 @@ function App() {
   return (
     <ThemeProvider>
       <Router>
-        <Routes>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/workspace/:sessionId" element={<WorkspacePage />} />
-        </Routes>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: '100vh' }}>
+          <Routes>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/workspace/:sessionId" element={<WorkspacePage />} />
+          </Routes>
+        </div>
       </Router>
     </ThemeProvider>
   )

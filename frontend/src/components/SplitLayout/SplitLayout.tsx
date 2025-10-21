@@ -10,7 +10,7 @@ interface SplitLayoutProps {
 export function SplitLayout({
   leftPanel,
   rightPanel,
-  defaultSplitPercentage = 50,
+  defaultSplitPercentage = 30,
 }: SplitLayoutProps) {
   const [splitPercentage, setSplitPercentage] = useState(defaultSplitPercentage)
   const [isDragging, setIsDragging] = useState(false)

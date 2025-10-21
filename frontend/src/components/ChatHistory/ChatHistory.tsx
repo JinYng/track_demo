@@ -22,11 +22,11 @@ export function ChatHistory({ messages, isLoading = false }: ChatHistoryProps) {
     <div ref={scrollRef} className="chat-history">
       {messages.length === 0 ? (
         <div className="chat-history__empty">
-          <div className="chat-history__empty-title">AI 基因组分析助手</div>
+          <div className="chat-history__empty-title">AI Genomics Assistant</div>
           <div className="chat-history__empty-subtitle">
-            开始与AI对话，探索基因组数据
+            Start chatting with AI to explore genomic data
             <br />
-            例如：显示BRCA1基因的位置
+            Example: Show me the location of BRCA1 gene
           </div>
         </div>
       ) : (

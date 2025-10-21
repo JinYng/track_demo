@@ -22,7 +22,7 @@ interface ChatInterfaceProps {
   viewState: any // JBrowse viewState
 }
 
-export function ChatInterface({ viewState }: ChatInterfaceProps) {
+export function ChatInterface({ viewState: _viewState }: ChatInterfaceProps) {
   // 应用配置状态 - 用于UI显示和API连接
   const [appConfig, setAppConfig] = useState<AppConfig>({
     apiBaseUrl: 'https://api-inference.modelscope.cn/v1',
@@ -36,23 +36,23 @@ export function ChatInterface({ viewState }: ChatInterfaceProps) {
   })
 
   const [isLoading, setIsLoading] = useState(false)
-  const [isConnected, setIsConnected] = useState(false)
+  const [_isConnected, setIsConnected] = useState(false)
   const [connectionStatus, setConnectionStatus] = useState<
     'idle' | 'testing' | 'success' | 'error'
   >('idle')
 
   // WebSocket消息处理器
   const handleWebSocketMessage = useCallback((response: any) => {
-    // 处理连接测试响应
+    // Handle connection test response
     if (response.type === 'test_connection_result') {
       setConnectionStatus(response.success ? 'success' : 'error')
       return
     }
 
-    // 处理普通AI响应
-    let content = '收到响应'
+    // Handle AI response
+    let content = 'Response received'
 
-    // 处理不同的响应格式
+    // Handle different response formats
     if (response.response?.content) {
       content = response.response.content
     } else if (response.message) {
@@ -75,7 +75,7 @@ export function ChatInterface({ viewState }: ChatInterfaceProps) {
     setIsLoading(false)
   }, [])
 
-  // WebSocket连接状态处理器
+  // WebSocket connection state handler
   const handleConnectionChange = useCallback((connected: boolean) => {
     setIsConnected(connected)
     if (!connected) {
@@ -176,19 +176,19 @@ export function ChatInterface({ viewState }: ChatInterfaceProps) {
     setIsLoading(true)
 
     try {
-      if (!websocketService.isConnected()) {
-        throw new Error('WebSocket未连接')
+      if (!websocketService.isConnected) {
+        throw new Error('WebSocket not connected')
       }
 
       // 构建干净的API请求 - 只发送对话历史，不包含配置信息
       await websocketService.sendMessage(content, appConfig, chatState.messages)
     } catch (error) {
-      console.error('发送消息失败:', error)
+      console.error('Failed to send message:', error)
 
       // 添加错误消息
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: `发送消息失败: ${error instanceof Error ? error.message : '未知错误'}`,
+        content: `Failed to send message: ${error instanceof Error ? error.message : 'Unknown error'}`,
         sender: 'ai',
         timestamp: new Date(),
       }

@@ -55,25 +55,24 @@ export function UserInput({ onSendMessage, disabled = false }: UserInputProps) {
           value={message}
           onChange={handleTextareaChange}
           onKeyDown={handleKeyDown}
-          placeholder="输入您的基因组学问题... (Enter发送，Shift+Enter换行)"
+          placeholder="Ask about genomics data... (Enter to send, Shift+Enter for new line)"
           disabled={disabled}
         />
 
         <button
-          className={`user-input__button ${
-            message.trim() && !disabled
+          className={`user-input__button ${message.trim() && !disabled
               ? 'user-input__button--active'
               : 'user-input__button--disabled'
-          }`}
+            }`}
           onClick={handleSend}
           disabled={!message.trim() || disabled}
         >
-          {disabled ? '...' : '发送'}
+          {disabled ? '...' : 'Send'}
         </button>
       </div>
 
       <div className="user-input__hint">
-        Enter 发送 • Shift+Enter 换行 • Ctrl+Enter 强制发送
+        Enter to send • Shift+Enter for new line • Ctrl+Enter to force send
       </div>
     </div>
   )

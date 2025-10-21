@@ -44,15 +44,15 @@ export function ModelConfiguration({
   const getStatusText = (status: ConnectionStatus): string => {
     switch (status) {
       case 'idle':
-        return '未测试'
+        return 'Not tested'
       case 'testing':
-        return '测试中...'
+        return 'Testing...'
       case 'success':
-        return '连接成功'
+        return 'Connected'
       case 'error':
-        return '连接失败'
+        return 'Connection failed'
       default:
-        return '未知状态'
+        return 'Unknown status'
     }
   }
 
@@ -64,9 +64,9 @@ export function ModelConfiguration({
         onClick={() => setIsModalOpen(true)}
       >
         <div>
-          <div className="model-config__title">模型设置</div>
+          <div className="model-config__title">Model Settings</div>
           <div className="model-config__subtitle">
-            {config.modelName || '未配置'}
+            {config.modelName || 'Not configured'}
           </div>
         </div>
         <div className="model-config__status">
@@ -74,11 +74,11 @@ export function ModelConfiguration({
             className={`model-config__indicator model-config__indicator--${connectionStatus}`}
             title={getStatusText(connectionStatus)}
           />
-          <div className="model-config__icon">设置</div>
+          <div className="model-config__icon">Settings</div>
         </div>
       </div>
 
-      {/* 配置模态框 */}
+      {/* Configuration modal */}
       {isModalOpen && (
         <div
           className="model-config__overlay"
@@ -89,7 +89,7 @@ export function ModelConfiguration({
           }}
         >
           <div className="model-config__modal">
-            <h3 className="model-config__modal-title">模型配置</h3>
+            <h3 className="model-config__modal-title">Model Configuration</h3>
 
             <div className="model-config__field">
               <label className="model-config__label">API Base URL</label>
@@ -135,13 +135,13 @@ export function ModelConfiguration({
                 className="model-config__button model-config__button--secondary"
                 onClick={handleCancel}
               >
-                取消
+                Cancel
               </button>
               <button
                 className="model-config__button model-config__button--primary"
                 onClick={handleSave}
               >
-                保存
+                Save
               </button>
             </div>
           </div>

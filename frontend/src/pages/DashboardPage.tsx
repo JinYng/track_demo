@@ -47,7 +47,7 @@ export default function DashboardPage() {
     navigate(`/workspace/${sessionId}`)
   }
 
-  const handleCreateSession = (sessionData: any) => {
+  const handleCreateSession = (_sessionData: any) => {
     // 这里会创建新的会话并导航到工作区
     const newSessionId = Date.now().toString()
     navigate(`/workspace/${newSessionId}`)
