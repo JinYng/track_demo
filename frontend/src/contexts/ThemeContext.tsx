@@ -38,9 +38,9 @@ interface Theme {
 // 浅色主题
 export const lightTheme: Theme = {
   colors: {
-    background: '#FFFFFF',
-    surface: '#F8F9FA',
-    primary: '#1A73E8',
+    background: '#ffffffff',
+    surface: '#ffffffff',
+    primary: '#092d5cff',
     text: '#202124',
     secondaryText: '#5F6368',
     border: '#E0E0E0',

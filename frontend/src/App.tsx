@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from './contexts/ThemeContext'
 import DashboardPage from './pages/DashboardPage'
 import WorkspacePage from './pages/WorkspacePage'
-import './i18n'
+import './config/i18n'
 
 function App() {
   return (

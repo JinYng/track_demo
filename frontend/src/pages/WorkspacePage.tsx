@@ -1,9 +1,9 @@
 import { useParams } from 'react-router-dom'
 import { useTheme } from '../contexts/ThemeContext'
 import { useSession, SessionProvider, defaultSessionConfig, SessionConfig } from '../contexts/SessionContext'
-import { ChatInterface } from '../components/ChatInterface'
+import { ChatInterface } from '../components/chat/ChatInterface'
 import { GenomeBrowser } from '../components/GenomeBrowser'
-import { SplitLayout } from '../components/SplitLayout'
+import { SplitLayout } from '../components/ui/SplitLayout'
 
 /**
  * WorkspacePageContent 组件
@@ -96,7 +96,7 @@ function WorkspacePageContent() {
       {/* 主工作区：使用SplitLayout分屏 */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         <SplitLayout
-          defaultSplitPercentage={40}
+          defaultSplitPercentage={25}
           leftPanel={
             // 左侧: AI助手 (复用现有ChatInterface组件)
             <ChatInterface viewState={null} />

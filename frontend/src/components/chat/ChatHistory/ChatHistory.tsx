@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
-import { MessageBubble, Message } from '../MessageBubble'
-import { ThinkingIndicator } from '../ThinkingIndicator'
+import { MessageBubble, Message } from '../../ui/MessageBubble'
+import { ThinkingIndicator } from '../../ui/ThinkingIndicator'
 import './ChatHistory.css'
 
 interface ChatHistoryProps {

@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
-import { ModelConfiguration } from '../ModelConfiguration'
-import { ChatHistory } from '../chat/ChatHistory'
-import { UserInput } from '../chat/UserInput'
-import { Message } from '../ui/MessageBubble'
-import { websocketService } from '../../services/websocket'
+import { ModelConfiguration } from '../../ModelConfiguration'
+import { ChatHistory } from '../ChatHistory'
+import { UserInput } from '../UserInput'
+import { Message } from '../../ui/MessageBubble'
+import { websocketService } from '../../../services/websocket'
 import './ChatInterface.css'
 
 // 应用配置接口 - 用于UI显示和连接配置

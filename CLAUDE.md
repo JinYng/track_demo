@@ -1,0 +1,252 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+AI Genomics Assistant - A bilingual (Chinese/English) AI-powered genomics analysis platform integrating JBrowse 2 genome browser with real-time AI chat capabilities.
+
+**Architecture**: Monorepo with frontend (React + TypeScript) and backend (FastAPI + Python) in separate directories.
+
+## Development Commands
+
+### Backend (FastAPI + Python)
+
+```bash
+# Activate conda environment (required)
+conda activate gene
+
+# Start backend server (recommended method)
+cd backend
+python start_dev.py
+
+# Alternative: Direct uvicorn
+cd backend
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Run WebSocket test
+cd backend
+python test_websocket.py
+```
+
+**Backend runs on**: `http://localhost:8000`
+**API docs**: `http://localhost:8000/docs`
+**WebSocket endpoint**: `ws://localhost:8000/ws`
+
+### Frontend (React + Vite)
+
+```bash
+# Install dependencies (first time)
+cd frontend
+npm install
+
+# Start dev server
+cd frontend
+npm run dev
+
+# Build for production
+cd frontend
+npm run build
+
+# Lint code
+cd frontend
+npm run lint
+```
+
+**Frontend runs on**: `http://localhost:5173`
+
+### Root-level Commands
+
+```bash
+# Install all dependencies (frontend + backend)
+npm run install:all
+
+# Start frontend only
+npm run dev:frontend
+
+# Start backend only (requires conda environment)
+npm run dev:backend
+
+# Build frontend
+npm run build:frontend
+
+# Lint frontend
+npm run lint
+```
+
+## Architecture Overview
+
+### Core Communication Pattern
+
+The application uses **WebSocket-based real-time bidirectional communication** between frontend and backend:
+
+- **Frontend WebSocket Service** (`frontend/src/services/websocket.ts`): Singleton service managing WebSocket connections with automatic reconnection, message handling, and connection state management
+- **Backend WebSocket Manager** (`backend/app/services/websocket_manager.py`): Manages multiple concurrent WebSocket connections
+- **Message Flow**: User query → WebSocket → AI Service (LangChain) → WebSocket → Chat Interface
+
+### State Management Architecture
+
+**Critical separation of concerns:**
+
+1. **Application Configuration State** (`ModelConfiguration` component): API keys, base URLs, model names - stored in component state, NOT passed through chat history
+2. **Chat State** (`ChatInterface` component): Pure conversation history (user/assistant messages only)
+
+The WebSocket message format sends:
+- `query`: Current user message
+- `messages`: Array of `{role: 'user'|'assistant', content: string}` for chat history
+- `ai_model_config`: Model configuration object (apiBaseUrl, apiKey, modelName)
+
+**Never mix configuration with chat history** - they are separate data flows.
+
+### Backend Service Layers
+
+```
+app/
+├── main.py              # FastAPI app, CORS, WebSocket endpoint
+├── api/routes.py        # RESTful API endpoints
+├── core/config.py       # Application settings
+├── services/
+│   ├── ai_service.py          # AI query processing with LangChain
+│   └── websocket_manager.py   # WebSocket connection pool
+└── tools/
+    └── jbrowse_tools.py       # JBrowse control toolkit (future)
+```
+
+**AI Service Flow**:
+1. Receives query + model config via WebSocket
+2. If API key is `"test-key"` → return instant mock response (~100ms)
+3. Otherwise → create ChatOpenAI instance → invoke with system prompt → return response
+4. Tool extraction/execution logic exists but not yet implemented
+
+### Frontend Component Architecture
+
+**Current component structure** (post-refactor):
+
+```
+components/
+├── chat/
+│   ├── ChatInterface/    # Main chat container, state management
+│   ├── ChatHistory/      # Message list display
+│   └── UserInput/        # Input box with send button
+├── ui/
+│   ├── MessageBubble/    # Individual message rendering
+│   ├── ThinkingIndicator/  # AI loading animation
+│   └── SplitLayout/      # Resizable split pane
+├── GenomeBrowser/
+│   ├── GenomeBrowser.tsx   # JBrowse 2 integration
+│   ├── JBrowseViewer.tsx   # JBrowse viewer component
+│   └── BrowserControls.tsx # Browser control panel
+├── ModelConfiguration/    # AI model settings panel
+└── wizards/
+    └── SetupWizard.tsx    # Initial setup flow
+```
+
+**Key components**:
+- `SplitLayout`: Draggable divider for chat/browser split (vertical layout)
+- `ChatInterface`: Manages WebSocket connection, chat history, model config state
+- `GenomeBrowser`: Embeds JBrowse 2 using `@jbrowse/react-linear-genome-view`
+
+### JBrowse 2 Integration
+
+- Uses `@jbrowse/react-linear-genome-view` (v3.1.0) and `@jbrowse/react-app2` (v3.0.0)
+- Configuration in `frontend/src/config.ts` (assembly, tracks, theme)
+- Genome browser renders in right pane of split layout
+- Future: AI will control browser via backend JBrowse tools
+
+### Test Mode
+
+Frontend defaults to `test-key` for instant testing without real API keys. Backend detects this and returns genomics-specific mock responses with domain knowledge (gene info, DNA analysis concepts, etc.).
+
+## Technology Stack
+
+**Frontend**:
+- React 19 + TypeScript 5
+- Vite 6 (build tool)
+- JBrowse 2 for genome visualization
+- Native WebSocket for real-time communication
+- react-markdown for message rendering
+- i18next for internationalization (Chinese/English)
+
+**Backend**:
+- FastAPI (async Python web framework)
+- LangChain (AI orchestration)
+- OpenAI-compatible API support
+- Uvicorn (ASGI server)
+- Pydantic for data validation
+
+**Development Environment**:
+- WSL2 optimizations in Vite config (polling enabled for file watching)
+- Conda for Python environment management
+- Node.js >= 18.0.0 required
+
+## Important Implementation Notes
+
+### WebSocket Message Handling
+
+When processing WebSocket messages in backend (`app/main.py`):
+- Message type `"test_connection"` triggers connection test
+- Message type `"ai_query"` OR presence of `"query"` field triggers AI processing
+- Always use `json.dumps()` with `.isoformat()` for datetime serialization
+
+### Frontend WebSocket Service
+
+The `WebSocketService` class is a singleton (`websocketService` export). Key methods:
+- `connect()`: Establishes WebSocket connection
+- `sendMessage(query, modelConfig, chatHistory)`: Sends structured message
+- `onMessage(handler)`: Subscribe to incoming messages
+- `onConnectionChange(handler)`: Subscribe to connection state
+
+### Component Communication
+
+- `ChatInterface` owns both model configuration and chat history state
+- `ModelConfiguration` receives config/setters as props (controlled component)
+- WebSocket service is imported and used directly (singleton pattern)
+- No global state management library (useState + props)
+
+### Styling Approach
+
+- Each component has its own CSS file (e.g., `ChatInterface.css`)
+- Professional, emoji-free scientific interface design
+- Dark theme optimized for genomics work
+- Consistent spacing and typography
+
+## Common Development Tasks
+
+### Adding a New Chat Feature
+
+1. Modify `ChatInterface` state if needed
+2. Update WebSocket message structure in `websocket.ts` if new fields required
+3. Add backend message handler in `app/main.py` if new message type
+4. Update AI service processing in `ai_service.py` if logic changes
+
+### Adding a JBrowse Tool
+
+1. Define tool in `backend/app/tools/jbrowse_tools.py`
+2. Update AI system prompt in `ai_service.py` to include tool description
+3. Implement tool action extraction in `_extract_tool_actions()`
+4. Add execution logic in `_execute_tool_action()`
+
+### Testing API Changes
+
+1. Start backend: `cd backend && python start_dev.py`
+2. Visit API docs: `http://localhost:8000/docs`
+3. Test WebSocket: `cd backend && python test_websocket.py`
+4. Use test mode in frontend with `test-key` for rapid iteration
+
+## Project Status
+
+- ✅ Core architecture (frontend/backend separation, WebSocket communication)
+- ✅ AI chat interface with test mode
+- ✅ JBrowse 2 basic integration
+- ✅ Component refactoring complete (chat/, ui/, wizards/ structure)
+- 🚧 AI-controlled JBrowse tools (in progress)
+- 📋 Advanced genomics analysis features (planned)
+
+## Code Conventions
+
+- TypeScript strict mode enabled
+- No emojis in UI (professional scientific interface)
+- Bilingual support (Chinese primary, English secondary)
+- Component-scoped CSS (no global styles except index.css)
+- Async/await for all async operations
+- Comprehensive error handling with user-friendly messages

@@ -8,22 +8,34 @@
     overflow: hidden;
 }
 
-.genome-browser__view {
-    flex: 1;
-    overflow: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+
+
+/* 修改 JBrowse 左上角的菜单按钮背景色 */
+.jbrowse-wrapper button.MuiIconButton-root[data-testid="view_menu_icon"] {
+    background-color: transparent !important;
 }
 
-/* 浏览器控制按钮悬停效果 */
-.browser-controls__button:hover {
-    background-color: var(--hover-color, #f0f0f0);
-    transition: background-color 0.2s ease;
+/* 修改 JBrowse 主容器的背景色、阴影和 CSS 变量 */
+.jbrowse-wrapper .MuiPaper-root.MuiPaper-elevation.css-1ltju1u-MuiPaper-root-viewContainer,
+.jbrowse-wrapper .MuiPaper-root.MuiPaper-elevation12,
+.jbrowse-wrapper .MuiPaper-root[class*="viewContainer"] {
+    background-color: var(--surface-color, #ffffff) !important;
+    box-shadow: none !important;
+    /* 强制覆盖内联样式 */
+    background: var(--surface-color, #ffffff) !important;
+    /* 覆盖 CSS 变量 --Paper-shadow */
+    --Paper-shadow: none !important;
 }
 
-.browser-controls__button:active {
-    opacity: 0.7;
+/* 隐藏 JBrowse 右上角的介绍按钮（包含特定 SVG 图标的按钮） */
+.jbrowse-wrapper button.MuiIconButton-root[type="button"]:has(svg[viewBox="0 0 175 175"]) {
+    display: none !important;
+}
+
+/* 隐藏指向 jbrowse.org 的品牌链接/图片 */
+.jbrowse-wrapper a[href*="jbrowse.org"],
+.jbrowse-wrapper img[alt*="JBrowse" i] {
+    display: none !important;
 }
 
 /* 响应式设计 */
