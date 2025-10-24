@@ -4,9 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-AI Genomics Assistant - A bilingual (Chinese/English) AI-powered genomics analysis platform integrating JBrowse 2 genome browser with real-time AI chat capabilities.
+**GenoVerse AI** - A bilingual (Chinese/English) AI-powered genomics analysis platform integrating JBrowse 2 genome browser with real-time AI chat capabilities.
 
 **Architecture**: Monorepo with frontend (React + TypeScript) and backend (FastAPI + Python) in separate directories.
+
+**Key Features**:
+- Multi-session workspace management with persistent state
+- Real-time AI chat interface with WebSocket communication
+- Interactive genome browser (JBrowse 2) with AI-controlled navigation
+- Dark/Light theme support
+- Bilingual UI (Chinese/English) with i18next
 
 ## Development Commands
 
@@ -76,6 +83,13 @@ npm run lint
 
 ## Architecture Overview
 
+### Application Structure
+
+The application follows a **dual-page architecture**:
+
+1. **Dashboard Page** (`/`): Landing page with recent sessions, quick start, and session management
+2. **Workspace Page** (`/workspace/:sessionId`): Main analysis workspace with split-panel layout (AI chat + genome browser)
+
 ### Core Communication Pattern
 
 The application uses **WebSocket-based real-time bidirectional communication** between frontend and backend:
@@ -86,10 +100,17 @@ The application uses **WebSocket-based real-time bidirectional communication** b
 
 ### State Management Architecture
 
+**React Context-based architecture with three layers:**
+
+1. **Theme Context** (`ThemeContext`): Global theme state (dark/light mode), theme tokens (colors, fonts, spacing)
+2. **Session Context** (`SessionContext`): Workspace-level state (session config, organism, reference genome, tracks)
+3. **Component State**: Local UI state in components (chat history, input values, etc.)
+
 **Critical separation of concerns:**
 
 1. **Application Configuration State** (`ModelConfiguration` component): API keys, base URLs, model names - stored in component state, NOT passed through chat history
 2. **Chat State** (`ChatInterface` component): Pure conversation history (user/assistant messages only)
+3. **Session State** (`SessionContext`): Workspace metadata (organism, genome assembly, tracks, location)
 
 The WebSocket message format sends:
 - `query`: Current user message
@@ -97,6 +118,13 @@ The WebSocket message format sends:
 - `ai_model_config`: Model configuration object (apiBaseUrl, apiKey, modelName)
 
 **Never mix configuration with chat history** - they are separate data flows.
+
+### Session Management
+
+- Sessions are identified by `sessionId` (timestamp-based unique ID)
+- Session configs are persisted in `sessionStorage` with key `session_{sessionId}`
+- Each workspace has independent chat history and genome browser state
+- Dashboard displays recent sessions (currently mock data, ready for backend integration)
 
 ### Backend Service Layers
 
@@ -123,28 +151,42 @@ app/
 **Current component structure** (post-refactor):
 
 ```
-components/
-├── chat/
-│   ├── ChatInterface/    # Main chat container, state management
-│   ├── ChatHistory/      # Message list display
-│   └── UserInput/        # Input box with send button
-├── ui/
-│   ├── MessageBubble/    # Individual message rendering
-│   ├── ThinkingIndicator/  # AI loading animation
-│   └── SplitLayout/      # Resizable split pane
-├── GenomeBrowser/
-│   ├── GenomeBrowser.tsx   # JBrowse 2 integration
-│   ├── JBrowseViewer.tsx   # JBrowse viewer component
-│   └── BrowserControls.tsx # Browser control panel
-├── ModelConfiguration/    # AI model settings panel
-└── wizards/
-    └── SetupWizard.tsx    # Initial setup flow
+frontend/src/
+├── pages/
+│   ├── DashboardPage.tsx      # Landing page with session list
+│   └── WorkspacePage.tsx      # Main workspace (chat + browser)
+├── contexts/
+│   ├── ThemeContext.tsx       # Theme provider (dark/light mode)
+│   └── SessionContext.tsx     # Session state provider
+├── components/
+│   ├── chat/
+│   │   ├── ChatInterface/     # Main chat container, state management
+│   │   ├── ChatHistory/       # Message list display
+│   │   └── UserInput/         # Input box with send button
+│   ├── ui/
+│   │   ├── MessageBubble/     # Individual message rendering
+│   │   ├── ThinkingIndicator/ # AI loading animation
+│   │   └── SplitLayout/       # Resizable split pane (horizontal)
+│   ├── GenomeBrowser/
+│   │   ├── GenomeBrowser.tsx      # JBrowse 2 integration wrapper
+│   │   ├── JBrowseViewer.tsx      # JBrowse viewer component
+│   │   └── BrowserControls.tsx    # Browser control panel
+│   ├── ModelConfiguration/    # AI model settings panel
+│   └── wizards/
+│       └── SetupWizard.tsx    # Initial setup flow (modal)
+└── config/
+    ├── i18n.ts                # i18next configuration
+    └── theme.ts               # Theme tokens (legacy, now in ThemeContext)
 ```
 
 **Key components**:
-- `SplitLayout`: Draggable divider for chat/browser split (vertical layout)
+- `DashboardPage`: Session management, recent sessions display, "Start New Analysis" wizard
+- `WorkspacePage`: Uses `SessionProvider` to wrap workspace, manages sessionStorage persistence
+- `SplitLayout`: Draggable horizontal divider for chat/browser split (10%-90% range, default 25%/75%)
 - `ChatInterface`: Manages WebSocket connection, chat history, model config state
 - `GenomeBrowser`: Embeds JBrowse 2 using `@jbrowse/react-linear-genome-view`
+- `SetupWizard`: Multi-step modal for creating new analysis sessions
+- `ThemeProvider`: Wraps entire app, provides theme tokens and toggle function
 
 ### JBrowse 2 Integration
 

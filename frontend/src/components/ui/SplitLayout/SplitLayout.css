@@ -8,7 +8,7 @@
 .split-layout__left-panel {
   height: 100%;
   overflow: hidden;
-  border-right: 1px solid #e0e0e0;
+  /* 移除边框，分割线本身就是视觉分隔 */
 }
 
 .split-layout__right-panel {
@@ -17,20 +17,24 @@
 }
 
 .split-layout__divider {
-  width: 4px;
+  width: 1px;
   height: 100%;
-  background-color: #f0f0f0;
+  background-color: var(--divider-color, #e0e0e0);
   cursor: col-resize;
-  border-left: 1px solid #e0e0e0;
-  border-right: 1px solid #e0e0e0;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
 .split-layout__divider:hover {
-  background-color: #d0d0d0;
+  background-color: var(--divider-hover-color, #1976d2);
+  width: 3px;
+  margin-left: -1px;
+  /* 保持居中 */
 }
 
 .split-layout__divider--dragging {
-  background-color: #d0d0d0;
+  background-color: var(--divider-hover-color, #1976d2);
+  width: 3px;
+  margin-left: -1px;
   transition: none;
 }

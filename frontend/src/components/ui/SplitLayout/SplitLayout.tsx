@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react'
+import { useTheme } from '../../../contexts/ThemeContext'
 import './SplitLayout.css'
 
 interface SplitLayoutProps {
@@ -12,6 +13,7 @@ export function SplitLayout({
   rightPanel,
   defaultSplitPercentage = 30,
 }: SplitLayoutProps) {
+  const { theme } = useTheme()
   const [splitPercentage, setSplitPercentage] = useState(defaultSplitPercentage)
   const [isDragging, setIsDragging] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -57,7 +59,14 @@ export function SplitLayout({
   }, [isDragging, handleMouseMove, handleMouseUp])
 
   return (
-    <div ref={containerRef} className="split-layout">
+    <div
+      ref={containerRef}
+      className="split-layout"
+      style={{
+        '--divider-color': theme.colors.border,
+        '--divider-hover-color': theme.colors.primary,
+      } as React.CSSProperties & Record<string, string>}
+    >
       {/* 左侧面板 - AI对话界面 */}
       <div
         className="split-layout__left-panel"

@@ -197,3 +197,16 @@ frontend/dist-ssr/
 # Misc
 .DS_Store
 *.log
+
+# Package manager lock files
+# This project uses npm, so exclude yarn.lock
+yarn.lock
+**/yarn.lock
+
+# Development/project management tools
+.kiro/
+
+# Temporary development documentation
+IMPLEMENTATION_SUMMARY.md
+LAYOUT_OPTIMIZATION_REPORT.md
+PROJECT_STATUS.md
