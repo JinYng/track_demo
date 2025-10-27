@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useTheme } from '../contexts/ThemeContext'
-import SetupWizard from '../components/wizards/SetupWizard'
+import { CreateAnalysisModal } from '../components/SessionSetup'
 
 interface Session {
   id: string
@@ -78,7 +78,7 @@ export default function DashboardPage() {
             fontWeight: theme.fontWeights.bold,
           }}
         >
-          GenoVerse
+          CNCB Geno Browser
         </div>
         <div style={{ display: 'flex', gap: theme.spacing.md }}>
           <button
@@ -279,17 +279,16 @@ export default function DashboardPage() {
             color: theme.colors.secondaryText,
           }}
         >
-          © 2025 GenoVerse AI
+          © 2025 CNCB Geno Browser
         </footer>
       </main>
 
-      {/* 设置向导模态框 */}
-      {showWizard && (
-        <SetupWizard
-          onClose={() => setShowWizard(false)}
-          onComplete={handleCreateSession}
-        />
-      )}
+      {/* 创建分析模态框 */}
+      <CreateAnalysisModal
+        isOpen={showWizard}
+        onClose={() => setShowWizard(false)}
+        onSubmit={handleCreateSession}
+      />
     </div>
   )
 }

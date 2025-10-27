@@ -49,7 +49,7 @@ function WorkspacePageContent() {
               fontWeight: theme.fontWeights.bold,
             }}
           >
-            GenoVerse
+            CNCB Geno Browser
           </div>
           <span style={{ color: theme.colors.secondaryText }}>{'>'}</span>
           <span style={{ fontSize: theme.fontSizes.body }}>

@@ -1,4 +1,4 @@
-// GenoVerse 视觉设计系统 (VDS)
+// CNCB Geno Browser 视觉设计系统 (VDS)
 export interface Theme {
     colors: {
         background: string

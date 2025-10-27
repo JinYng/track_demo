@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from './contexts/ThemeContext'
 import DashboardPage from './pages/DashboardPage'
 import WorkspacePage from './pages/WorkspacePage'
+import APIInvestigationPage from './pages/APIInvestigationPage'
 import './config/i18n'
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
           <Routes>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/workspace/:sessionId" element={<WorkspacePage />} />
+            <Route path="/api-investigation" element={<APIInvestigationPage />} />
           </Routes>
         </div>
       </Router>
