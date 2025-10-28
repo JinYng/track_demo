@@ -115,12 +115,32 @@ const tracks = [
   },
 ];
 
-// 3. 组合成最终给 JBrowseLinearGenomeView 组件使用的配置对象
+// 3. 定义 JBrowse 主题 (遵循官方文档格式)
+const jbrowseTheme = {
+  palette: {
+    primary: {
+      main: '#202124'
+    },
+    secondary: {
+      main: '#ffffffff'
+    },
+    tertiary: {
+      main: '#F1F3F4'
+    },
+    quaternary: {
+      main: '#092d5cff'
+    }
+  }
+};
+
+// 4. 组合成最终给 JBrowseLinearGenomeView 组件使用的配置对象
 const viewConfig = {
   assembly,
   tracks,
   // 定义默认加载的基因组位置
   location: '10:29,838,565..29,838,850',
+  // 应用自定义主题
+  theme: jbrowseTheme,
   // 定义默认会话
   defaultSession: {
     name: 'My session',
