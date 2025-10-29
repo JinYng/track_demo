@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { useTheme } from '../contexts/ThemeContext'
-import { useSession, SessionProvider, defaultSessionConfig, SessionConfig } from '../contexts/SessionContext'
+import { SessionProvider, defaultSessionConfig, SessionConfig } from '../contexts/SessionContext'
 import { ChatInterface } from '../components/chat/ChatInterface'
 import { GenomeBrowser } from '../components/GenomeBrowser'
 import { SplitLayout } from '../components/ui/SplitLayout'
@@ -12,7 +12,6 @@ import { SplitLayout } from '../components/ui/SplitLayout'
 function WorkspacePageContent() {
   const { sessionId } = useParams<{ sessionId: string }>()
   const { theme } = useTheme()
-  const { config } = useSession()
 
   return (
     <div
@@ -26,73 +25,6 @@ function WorkspacePageContent() {
         flexDirection: 'column',
       }}
     >
-      {/* 顶部导航栏 */}
-      <header
-        style={{
-          padding: theme.spacing.md,
-          borderBottom: `1px solid ${theme.colors.border}`,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: theme.spacing.md,
-          }}
-        >
-          <div
-            style={{
-              fontSize: '20px',
-              fontWeight: theme.fontWeights.bold,
-            }}
-          >
-            CNCB Geno Browser
-          </div>
-          <span style={{ color: theme.colors.secondaryText }}>{'>'}</span>
-          <span style={{ fontSize: theme.fontSizes.body }}>
-            {config.name} ({config.organism} - {config.referenceGenome})
-          </span>
-        </div>
-        <div style={{ display: 'flex', gap: theme.spacing.md }}>
-          <button
-            style={{
-              background: 'none',
-              border: 'none',
-              color: theme.colors.text,
-              fontSize: theme.fontSizes.body,
-              cursor: 'pointer',
-            }}
-          >
-            Save
-          </button>
-          <button
-            style={{
-              background: 'none',
-              border: 'none',
-              color: theme.colors.text,
-              fontSize: theme.fontSizes.body,
-              cursor: 'pointer',
-            }}
-          >
-            Export
-          </button>
-          <button
-            style={{
-              background: 'none',
-              border: 'none',
-              color: theme.colors.text,
-              fontSize: theme.fontSizes.body,
-              cursor: 'pointer',
-            }}
-          >
-            Settings
-          </button>
-        </div>
-      </header>
-
       {/* 主工作区：使用SplitLayout分屏 */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         <SplitLayout
