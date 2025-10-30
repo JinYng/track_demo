@@ -11,7 +11,6 @@ const assembly = {
     trackId: 'GRCh38-ReferenceSequenceTrack',
     adapter: {
       type: 'BgzipFastaAdapter',
-      // 最佳实践：明确提供 fasta, fai, 和 gzi 文件的位置
       fastaLocation: {
         uri: 'https://jbrowse.org/genomes/GRCh38/fasta/hg38.prefix.fa.gz',
       },

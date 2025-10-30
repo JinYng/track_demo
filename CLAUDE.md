@@ -85,10 +85,35 @@ npm run lint
 
 ### Application Structure
 
-The application follows a **dual-page architecture**:
+The application follows a **multi-page architecture** with 10 distinct pages:
 
-1. **Dashboard Page** (`/`): Landing page with recent sessions, quick start, and session management
-2. **Workspace Page** (`/workspace/:sessionId`): Main analysis workspace with split-panel layout (AI chat + genome browser)
+**Core Pages**:
+1. **Genomes Page** (`/`): Landing page featuring:
+   - Popular species selection (Human, Mouse, Zebrafish, Fruitfly, Yeast)
+   - Genome assembly search across thousands of genomes
+   - Position search with assembly selector (hg38, hg19, mm10, mm9)
+   - Recent sessions display with quick access
+   - "Start New Analysis" button to launch setup wizard
+
+2. **Browser Config Page** (`/browser`): Session creation page with:
+   - New session form (session name, reference genome selection)
+   - Recent sessions quick load (displays 3 most recent)
+   - "View All Sessions" link to return to Genomes page
+
+3. **Workspace Page** (`/browser/:sessionId`): Main analysis workspace with:
+   - Split-panel layout (AI chat + genome browser)
+   - Real-time AI chat interface
+   - Interactive JBrowse 2 genome browser
+   - Model configuration panel
+
+**Navigation & Additional Pages**:
+- **Global Navigation Bar**: Persistent across all pages with left-side navigation (Genomes, Genome Browser, Tools, 3D Genomics, Spatial-Omics, Downloads) and right-side links (Help, About)
+- **Tools Page** (`/tools`): Genomics tools hub (placeholder)
+- **3D Genomics Page** (`/3d-genomics`): 3D genome visualization (placeholder)
+- **Spatial-Omics Page** (`/spatial-omics`): Spatial transcriptomics analysis (placeholder)
+- **Downloads Page** (`/downloads`): Data and resource downloads (placeholder)
+- **Help Page** (`/help`): Documentation and help resources (placeholder)
+- **About Page** (`/about`): Project information and credits (placeholder)
 
 ### Core Communication Pattern
 
@@ -124,7 +149,13 @@ The WebSocket message format sends:
 - Sessions are identified by `sessionId` (timestamp-based unique ID)
 - Session configs are persisted in `sessionStorage` with key `session_{sessionId}`
 - Each workspace has independent chat history and genome browser state
-- Dashboard displays recent sessions (currently mock data, ready for backend integration)
+- Sessions can be created from:
+  - `GenomesPage` (/): "Start New Analysis" button launches `CreateAnalysisModal`
+  - `BrowserConfigPage` (/browser): Session creation form
+- Recent sessions displayed on:
+  - `GenomesPage`: Full list with detailed cards (mock data)
+  - `BrowserConfigPage`: Quick access to 3 most recent sessions
+- Session routing: `/browser/:sessionId` opens the workspace for that session
 
 ### Backend Service Layers
 
@@ -148,44 +179,59 @@ app/
 
 ### Frontend Component Architecture
 
-**Current component structure** (post-refactor):
+**Current component structure**:
 
 ```
 frontend/src/
 ├── pages/
-│   ├── DashboardPage.tsx      # Landing page with session list
-│   └── WorkspacePage.tsx      # Main workspace (chat + browser)
+│   ├── GenomesPage.tsx           # Landing page (/) - species selection, session management
+│   ├── BrowserConfigPage.tsx     # Session creation (/browser)
+│   ├── WorkspacePage.tsx          # Main workspace (/browser/:sessionId)
+│   ├── ToolsPage.tsx              # Tools hub (/tools) - placeholder
+│   ├── ThreeDGenomicsPage.tsx     # 3D visualization (/3d-genomics) - placeholder
+│   ├── SpatialOmicsPage.tsx       # Spatial transcriptomics (/spatial-omics) - placeholder
+│   ├── DownloadsPage.tsx          # Downloads (/downloads) - placeholder
+│   ├── HelpPage.tsx               # Help docs (/help) - placeholder
+│   ├── AboutPage.tsx              # About (/about) - placeholder
+│   └── APIInvestigationPage.tsx   # (not in router, dev/testing)
 ├── contexts/
-│   ├── ThemeContext.tsx       # Theme provider (dark/light mode)
-│   └── SessionContext.tsx     # Session state provider
+│   ├── ThemeContext.tsx           # Theme provider (dark/light mode)
+│   └── SessionContext.tsx         # Session state provider
 ├── components/
+│   ├── layout/
+│   │   └── GlobalNavbar/          # Persistent navigation bar across all pages
+│   │       ├── GlobalNavbar.tsx
+│   │       └── GlobalNavbar.css
 │   ├── chat/
-│   │   ├── ChatInterface/     # Main chat container, state management
-│   │   ├── ChatHistory/       # Message list display
-│   │   └── UserInput/         # Input box with send button
+│   │   ├── ChatInterface/         # Main chat container, state management
+│   │   ├── ChatHistory/           # Message list display
+│   │   └── UserInput/             # Input box with send button
 │   ├── ui/
-│   │   ├── MessageBubble/     # Individual message rendering
-│   │   ├── ThinkingIndicator/ # AI loading animation
-│   │   └── SplitLayout/       # Resizable split pane (horizontal)
+│   │   ├── MessageBubble/         # Individual message rendering
+│   │   ├── ThinkingIndicator/     # AI loading animation
+│   │   ├── SplitLayout/           # Resizable split pane (horizontal)
+│   │   └── FileInput/             # File upload component
 │   ├── GenomeBrowser/
 │   │   ├── GenomeBrowser.tsx      # JBrowse 2 integration wrapper
 │   │   ├── JBrowseViewer.tsx      # JBrowse viewer component
 │   │   └── BrowserControls.tsx    # Browser control panel
-│   ├── ModelConfiguration/    # AI model settings panel
-│   └── wizards/
-│       └── SetupWizard.tsx    # Initial setup flow (modal)
+│   ├── ModelConfiguration/        # AI model settings panel
+│   └── SessionSetup/
+│       └── CreateAnalysisModal/   # Modal for creating new analysis sessions
 └── config/
-    ├── i18n.ts                # i18next configuration
-    └── theme.ts               # Theme tokens (legacy, now in ThemeContext)
+    ├── i18n.ts                    # i18next configuration
+    └── theme.ts                   # Theme tokens (legacy, now in ThemeContext)
 ```
 
 **Key components**:
-- `DashboardPage`: Session management, recent sessions display, "Start New Analysis" wizard
+- `GenomesPage`: Landing page with species selector, genome search, position finder, and recent sessions display
+- `BrowserConfigPage`: Simple session creation form with recent sessions quick access
 - `WorkspacePage`: Uses `SessionProvider` to wrap workspace, manages sessionStorage persistence
+- `GlobalNavbar`: Persistent navigation with 8 links (Genomes, Genome Browser, Tools, 3D Genomics, Spatial-Omics, Downloads, Help, About)
 - `SplitLayout`: Draggable horizontal divider for chat/browser split (10%-90% range, default 25%/75%)
 - `ChatInterface`: Manages WebSocket connection, chat history, model config state
 - `GenomeBrowser`: Embeds JBrowse 2 using `@jbrowse/react-linear-genome-view`
-- `SetupWizard`: Multi-step modal for creating new analysis sessions
+- `CreateAnalysisModal`: Multi-step modal for creating new analysis sessions (launched from GenomesPage)
 - `ThemeProvider`: Wraps entire app, provides theme tokens and toggle function
 
 ### JBrowse 2 Integration
@@ -254,6 +300,17 @@ The `WebSocketService` class is a singleton (`websocketService` export). Key met
 
 ## Common Development Tasks
 
+### Adding a New Page
+
+1. Create new page component in `frontend/src/pages/` (e.g., `NewPage.tsx`)
+2. Import the page in `frontend/src/App.tsx`
+3. Add route to `<Routes>` in App.tsx: `<Route path="/new-page" element={<NewPage />} />`
+4. Add navigation link to `GlobalNavbar.tsx`:
+   - Add to `leftNavItems` array for main navigation
+   - Add to `rightNavItems` array for utility links (Help, About)
+5. Use `useTheme()` hook for consistent styling
+6. Follow existing page structure patterns (GenomesPage, ToolsPage as references)
+
 ### Adding a New Chat Feature
 
 1. Modify `ChatInterface` state if needed
@@ -278,10 +335,13 @@ The `WebSocketService` class is a singleton (`websocketService` export). Key met
 ## Project Status
 
 - ✅ Core architecture (frontend/backend separation, WebSocket communication)
+- ✅ Multi-page navigation system with GlobalNavbar
 - ✅ AI chat interface with test mode
 - ✅ JBrowse 2 basic integration
-- ✅ Component refactoring complete (chat/, ui/, wizards/ structure)
+- ✅ Component refactoring complete (chat/, ui/, layout/ structure)
+- ✅ Session management across multiple pages (Genomes, BrowserConfig, Workspace)
 - 🚧 AI-controlled JBrowse tools (in progress)
+- 📋 Tools, 3D Genomics, Spatial-Omics pages (placeholders, awaiting implementation)
 - 📋 Advanced genomics analysis features (planned)
 
 ## Code Conventions
