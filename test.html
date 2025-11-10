@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>基因三维球棍模型展示</title>
+  <!-- 引入最新版3Dmol.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.5.3/3Dmol-min.js"></script>
+  <style>
+    #viewer {
+      width: 800px;
+      height: 600px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="viewer"></div>
+
+  <script>
+    // 初始化3D查看器
+    let viewer = $3Dmol.createViewer("viewer");
+
+    // 读取PDB文件（请替换为你的文件路径）
+    fetch("frontend/public/3Ddata/GSE92825_ENCFF056VLK/VC_1mb/3DMax/chr1.pdb") 
+      .then(response => response.text())
+      .then(pdbText => {
+        // 加载PDB数据
+        viewer.addModel(pdbText, "pdb");
+        
+        // 设置球棍模型样式
+        viewer.setStyle({}, {
+          stick: {radius: 0.1},
+          sphere: {radius: 0.3}
+        });
+        
+        // 适配视角并渲染
+        viewer.zoomTo();
+        viewer.render();
+      })
+      .catch(error => {
+        console.error("加载PDB文件失败：", error);
+      });
+  </script>
+</body>
+</html>
