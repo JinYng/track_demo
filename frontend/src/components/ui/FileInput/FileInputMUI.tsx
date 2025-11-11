@@ -10,7 +10,6 @@ import {
     Stack,
 } from '@mui/material'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
-import { useTheme } from '../../../contexts/ThemeContext'
 
 interface FileInputMUIProps {
     value: string
@@ -34,7 +33,6 @@ export default function FileInputMUI({
     description,
 }: FileInputMUIProps) {
     const { t } = useTranslation()
-    const { theme } = useTheme()
     const [mode, setMode] = useState<'file' | 'url'>('url')
     const [fileName, setFileName] = useState<string>('')
     const fileInputRef = useRef<HTMLInputElement>(null)

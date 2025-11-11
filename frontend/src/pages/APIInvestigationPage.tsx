@@ -14,7 +14,6 @@ export default function APIInvestigationPage() {
   const [reportData, setReportData] = useState<any>(null)
   const [trackMethods, setTrackMethods] = useState<any>(null)
   const [availableTracks, setAvailableTracks] = useState<any[]>([])
-  const [displayedTracks, setDisplayedTracks] = useState<any[]>([])
   const [error, setError] = useState<string>('')
 
   useEffect(() => {
@@ -38,7 +37,6 @@ export default function APIInvestigationPage() {
       setAvailableTracks(available)
 
       const displayed = getDisplayedTracks(state)
-      setDisplayedTracks(displayed)
 
       // 打印到控制台
       console.log('=== JBrowse API Investigation ===')

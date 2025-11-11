@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom'
-import { AppBar, Toolbar, Box, Button } from '@mui/material'
+import { AppBar, Toolbar, Box } from '@mui/material'
 import { useTheme } from '../../../contexts/ThemeContext'
 
 const leftNavItems = [
