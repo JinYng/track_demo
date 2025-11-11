@@ -7,7 +7,7 @@ const resources = {
     en: {
         translation: {
             dashboard: {
-                title: 'Welcome to CNCB Geno Browser',
+                title: 'Welcome to CNCB Genome Browser',
                 subtitle: 'Your AI-powered genomics navigator',
                 startAnalysis: 'Start New Analysis',
                 recentSessions: 'Recent Sessions',

@@ -40,7 +40,7 @@ export function GlobalNavbar() {
                         textDecoration: 'none',
                     }}
                 >
-                    CNCB Geno Browser
+                    CNCB Genome Browser
                 </NavLink>
 
                 {/* Left Navigation Links */}

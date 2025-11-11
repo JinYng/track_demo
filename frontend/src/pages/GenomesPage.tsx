@@ -395,7 +395,7 @@ export default function GenomesPage() {
                         color: theme.colors.secondaryText,
                     }}
                 >
-                    © 2025 CNCB Geno Browser
+                    © 2025 CNCB Genome Browser
                 </footer>
             </main>
 
