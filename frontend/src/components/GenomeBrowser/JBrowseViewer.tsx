@@ -2,7 +2,7 @@
 import {
     createViewState,
     JBrowseLinearGenomeView,
-} from '@jbrowse/react-linear-genome-view';
+} from '@jbrowse/react-linear-genome-view2';
 // 导入我们配置好的 viewConfig
 import viewConfig from '../../config';
 

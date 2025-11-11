@@ -1,4 +1,5 @@
 # Dependencies
+
 node_modules/
 */node_modules/
 
@@ -176,6 +177,7 @@ $RECYCLE.BIN/
 *.temp
 
 # Project specific
+jbrowse-components-main
 # Backend specific
 backend/__pycache__/
 backend/.pytest_cache/

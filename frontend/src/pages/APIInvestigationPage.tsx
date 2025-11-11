@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { createViewState } from '@jbrowse/react-linear-genome-view'
+import { createViewState } from '@jbrowse/react-linear-genome-view2'
 import { useTheme } from '../contexts/ThemeContext'
 import {
   generateJBrowseAPIReport,
