@@ -17,11 +17,27 @@
     display: none !important;
 }
 
+/* ===== 隐藏 JBrowse 原生弹窗（在被移动到侧边栏之前） ===== */
+
+/* 暂时注释掉，用于调试 */
+/* body > .MuiDrawer-root,
+body > .MuiDialog-root {
+    visibility: hidden !important;
+    pointer-events: none !important;
+} */
+
+/* 隐藏 JBrowse 弹窗的背景遮罩 */
+body > .MuiBackdrop-root {
+    display: none !important;
+}
+
 /* ===== 右侧详情面板样式 ===== */
 
-/* 将 JBrowse 的 Drawer/Dialog 固定在右侧容器中 */
+/* 显示已经被移动到侧边栏的 JBrowse Drawer/Dialog */
 .jbrowse-sidebar-container .MuiDrawer-root,
 .jbrowse-sidebar-container .MuiDialog-root {
+    visibility: visible !important;
+    pointer-events: auto !important;
     position: absolute !important;
     top: 0 !important;
     right: 0 !important;
