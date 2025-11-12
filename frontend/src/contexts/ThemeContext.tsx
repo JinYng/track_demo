@@ -9,9 +9,12 @@ interface Theme {
     text: string
     secondaryText: string
     border: string
+    hover: string
+    accent: string
   }
   fonts: {
     primary: string
+    fallback: string
   }
   fontSizes: {
     h1: string
@@ -44,10 +47,13 @@ export const lightTheme: Theme = {
     text: '#202124',
     secondaryText: '#5F6368',
     border: '#E0E0E0',
+    hover: '#F5F5F5',
+    accent: '#1976D2',
   },
   fonts: {
     primary:
       'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    fallback: 'sans-serif',
   },
   fontSizes: {
     h1: '32px',
@@ -80,10 +86,13 @@ export const darkTheme: Theme = {
     text: '#E8EAED',
     secondaryText: '#9AA0A6',
     border: '#3C4043',
+    hover: '#3C4043',
+    accent: '#90CAF9',
   },
   fonts: {
     primary:
       'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    fallback: 'sans-serif',
   },
   fontSizes: {
     h1: '32px',

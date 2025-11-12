@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useTheme } from '../../../contexts/ThemeContext'
-import styles from './FileInput.module.css'
+import { Box, TextField, Tabs, Tab, Button, Typography } from '@mui/material'
+import UploadFileIcon from '@mui/icons-material/UploadFile'
 
 type InputMode = 'file' | 'url'
 
@@ -23,7 +23,6 @@ export default function FileInput({
   description,
 }: FileInputProps) {
   const { t } = useTranslation()
-  const { theme } = useTheme()
   const [mode, setMode] = useState<InputMode>('url')
   const [fileName, setFileName] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -32,8 +31,7 @@ export default function FileInput({
     const file = e.target.files?.[0]
     if (file) {
       setFileName(file.name)
-      // 这里可以后续处理文件上传逻辑
-      // 目前只记录文件名
+      onChange(file.name)
     }
   }
 
@@ -45,127 +43,110 @@ export default function FileInput({
     fileInputRef.current?.click()
   }
 
+  const handleTabChange = (
+    _event: React.SyntheticEvent,
+    newValue: InputMode,
+  ) => {
+    setMode(newValue)
+  }
+
   return (
-    <div className={styles.container}>
+    <Box sx={{ width: '100%' }}>
       {label && (
-        <label
-          style={{
+        <Typography
+          component="label"
+          variant="caption"
+          sx={{
             display: 'block',
-            fontSize: theme.fontSizes.caption,
             fontWeight: 500,
-            marginBottom: '0.25rem',
-            color: theme.colors.secondaryText,
+            mb: 0.5,
+            color: 'text.secondary',
           }}
         >
           {label}
-        </label>
+        </Typography>
       )}
 
-      <div
-        className={styles.tabs}
-        style={{
-          borderBottomColor: theme.colors.border,
+      <Tabs
+        value={mode}
+        onChange={handleTabChange}
+        sx={{
+          minHeight: 40,
+          mb: 1,
+          borderBottom: 1,
+          borderColor: 'divider',
         }}
       >
-        <button
-          className={`${styles.tab} ${mode === 'url' ? styles.active : ''}`}
-          onClick={() => setMode('url')}
-          style={{
-            color: theme.colors.text,
-          }}
-        >
-          {t('fileInput.url')}
-        </button>
-        <button
-          className={`${styles.tab} ${mode === 'file' ? styles.active : ''}`}
-          onClick={() => setMode('file')}
-          style={{
-            color: theme.colors.text,
-          }}
-        >
-          {t('fileInput.file')}
-        </button>
-      </div>
+        <Tab
+          label={t('fileInput.url')}
+          value="url"
+          sx={{ minHeight: 40, textTransform: 'none' }}
+        />
+        <Tab
+          label={t('fileInput.file')}
+          value="file"
+          sx={{ minHeight: 40, textTransform: 'none' }}
+        />
+      </Tabs>
 
-      <div className={styles.content}>
+      <Box sx={{ mt: 2 }}>
         {mode === 'url' && (
-          <input
+          <TextField
+            fullWidth
             type="text"
-            className={styles.urlInput}
             value={value}
             onChange={handleUrlChange}
             placeholder={placeholder}
-            style={{
-              padding: `${theme.spacing.sm}`,
-              border: 'none',
-              borderBottom: `2px solid ${theme.colors.border}`,
-              backgroundColor: 'transparent',
-              fontSize: theme.fontSizes.body,
-              color: theme.colors.text,
-              outline: 'none',
-            }}
+            variant="outlined"
+            size="small"
+            helperText={description}
           />
         )}
 
         {mode === 'file' && (
-          <div className={styles.fileInputWrapper}>
-            <button
-              type="button"
+          <Box>
+            <Button
+              variant="outlined"
               onClick={handleSelectFile}
-              style={{
-                padding: `${theme.spacing.sm} ${theme.spacing.md}`,
-                border: `1px solid ${theme.colors.border}`,
-                borderRadius: '4px',
-                backgroundColor: theme.colors.background,
-                color: theme.colors.text,
-                fontSize: theme.fontSizes.body,
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                (e.target as HTMLButtonElement).style.opacity = '0.8'
-              }}
-              onMouseLeave={(e) => {
-                (e.target as HTMLButtonElement).style.opacity = '1'
-              }}
+              startIcon={<UploadFileIcon />}
+              sx={{ textTransform: 'none' }}
             >
               {t('fileInput.selectFile')}
-            </button>
+            </Button>
             <input
               ref={fileInputRef}
               type="file"
               accept={accept}
               onChange={handleFileSelect}
-              style={{
-                display: 'none',
-              }}
+              style={{ display: 'none' }}
             />
-          </div>
+            {fileName && (
+              <Typography
+                variant="caption"
+                sx={{
+                  display: 'block',
+                  mt: 1,
+                  color: 'text.secondary',
+                }}
+              >
+                {t('fileInput.selected')}: {fileName}
+              </Typography>
+            )}
+            {description && (
+              <Typography
+                variant="caption"
+                sx={{
+                  display: 'block',
+                  mt: 1,
+                  color: 'text.secondary',
+                }}
+              >
+                {description}
+              </Typography>
+            )}
+          </Box>
         )}
-
-        {fileName && (
-          <div
-            className={styles.fileNameDisplay}
-            style={{
-              color: theme.colors.secondaryText,
-            }}
-          >
-            {t('fileInput.selected')}: {fileName}
-          </div>
-        )}
-
-        {description && (
-          <p
-            style={{
-              fontSize: theme.fontSizes.caption,
-              color: theme.colors.secondaryText,
-              margin: `${theme.spacing.xs} 0 0 0`,
-            }}
-          >
-            {description}
-          </p>
-        )}
-      </div>
-    </div>
+      </Box>
+    </Box>
   )
 }

@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { ThemeProvider } from './contexts/ThemeContext'
+import { CombinedThemeProvider } from './providers/CombinedThemeProvider'
 import { GlobalNavbar } from './components'
 import GenomesPage from './pages/GenomesPage'
 import BrowserConfigPage from './pages/BrowserConfigPage'
@@ -14,9 +14,15 @@ import './config/i18n'
 
 function App() {
   return (
-    <ThemeProvider>
+    <CombinedThemeProvider>
       <Router>
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: '100vh',
+          }}
+        >
           <GlobalNavbar />
           <Routes>
             <Route path="/" element={<GenomesPage />} />
@@ -31,7 +37,7 @@ function App() {
           </Routes>
         </div>
       </Router>
-    </ThemeProvider>
+    </CombinedThemeProvider>
   )
 }
 
