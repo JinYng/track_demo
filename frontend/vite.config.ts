@@ -7,6 +7,21 @@ export default defineConfig({
   base: './',
   build: {
     sourcemap: true,
+    // Optimize chunk splitting for better caching
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Separate vendor chunks for better caching
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'mui-core': ['@mui/material', '@emotion/react', '@emotion/styled'],
+          'mui-icons': ['@mui/icons-material'],
+          'jbrowse': ['@jbrowse/core', '@jbrowse/react-linear-genome-view2'],
+          'i18n': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
+        },
+      },
+    },
+    // Increase chunk size warning limit for JBrowse
+    chunkSizeWarningLimit: 1000,
   },
   worker: {
     format: 'es',

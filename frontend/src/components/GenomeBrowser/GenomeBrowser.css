@@ -16,3 +16,46 @@
 .jbrowse-wrapper img[alt*="JBrowse" i] {
     display: none !important;
 }
+
+/* ===== 右侧详情面板样式 ===== */
+
+/* 将 JBrowse 的 Drawer/Dialog 固定在右侧容器中 */
+.jbrowse-sidebar-container .MuiDrawer-root,
+.jbrowse-sidebar-container .MuiDialog-root {
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* 移除 Drawer 的背景遮罩 */
+.jbrowse-sidebar-container .MuiBackdrop-root {
+    display: none !important;
+}
+
+/* 调整 Drawer 内容的定位 */
+.jbrowse-sidebar-container .MuiDrawer-paper,
+.jbrowse-sidebar-container .MuiDialog-paper {
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+/* 确保详情内容可以滚动 */
+.jbrowse-sidebar-container .MuiDrawer-paper > div,
+.jbrowse-sidebar-container .MuiDialog-paper > div {
+    height: 100%;
+    overflow-y: auto;
+}

@@ -1,7 +1,7 @@
 // frontend/src/config.ts
 
 // JBrowse 2 线性基因组浏览器视图的配置文件
-// 这个配置是为 @jbrowse/react-linear-genome-view 组件特别准备的
+// 这个配置是为 @jbrowse/react-linear-genome-view2 组件特别准备的
 
 // 1. 定义基因组程序集 (Assembly)
 const assembly = {
