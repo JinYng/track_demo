@@ -28,7 +28,7 @@ function WorkspacePageContent() {
       {/* 主工作区：使用SplitLayout分屏 */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         <SplitLayout
-          defaultSplitPercentage={25}
+          defaultSplitPercentage={20}
           leftPanel={
             // 左侧: AI助手 (复用现有ChatInterface组件)
             <ChatInterface viewState={null} />

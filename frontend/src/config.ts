@@ -129,7 +129,9 @@ const jbrowseTheme = {
     quaternary: {
       main: '#092d5cff'
     }
-  }
+  },
+  // 移除阴影效果，使界面更扁平化
+  shadows: Array(25).fill('none')
 };
 
 // 4. 组合成最终给 JBrowseLinearGenomeView 组件使用的配置对象
@@ -140,6 +142,13 @@ const viewConfig = {
   location: '10:29,838,565..29,838,850',
   // 应用自定义主题
   theme: jbrowseTheme,
+  configuration: {
+    // 隐藏 JBrowse logo
+    logoPath: {
+      uri: '',
+      locationType: 'UriLocation'
+    }
+  },
   // 定义默认会话
   defaultSession: {
     name: 'My session',

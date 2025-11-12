@@ -11,6 +11,7 @@ import DownloadsPage from './pages/DownloadsPage'
 import HelpPage from './pages/HelpPage'
 import AboutPage from './pages/AboutPage'
 import './config/i18n'
+import './custom-logo.css'
 
 function App() {
   return (

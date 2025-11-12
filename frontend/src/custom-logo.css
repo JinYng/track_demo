@@ -1,0 +1,10 @@
+/* 完全隐藏 JBrowse Logo 按钮 */
+/* 隐藏包含 Logomark 的 IconButton */
+.MuiIconButton-root:has(div[style*="width: 22px"]) {
+    display: none !important;
+}
+
+/* 备用方案：直接隐藏 logo 容器 */
+.MuiIconButton-root div[style*="width: 22px"][style*="height: 22px"] {
+    display: none !important;
+}
