@@ -1,22 +1,11 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import {
-  Box,
-  Typography,
-  Button,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Grid,
-  Chip,
-  Divider,
-} from '@mui/material'
+import { Box, Typography, Button, Grid, Divider } from '@mui/material'
 import { PageLayout } from '../components/layout/PageLayout/PageLayout'
 import { SessionCard } from '../components/ui/SessionCard/SessionCard'
 import { CreateAnalysisModal } from '../components/SessionSetup'
+import { GenomeSelector } from '../components/GenomeSelector'
 
 interface Session {
   id: string
@@ -51,15 +40,10 @@ const mockSessions: Session[] = [
   },
 ]
 
-const popularSpecies = ['Human', 'Mouse', 'Zebrafish', 'Fruitfly', 'Yeast']
-
 export default function GenomesPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [showWizard, setShowWizard] = useState(false)
-  const [selectedAssembly, setSelectedAssembly] = useState('hg38')
-  const [positionSearch, setPositionSearch] = useState('')
-  const [genomeSearch, setGenomeSearch] = useState('')
 
   const handleOpenSession = (sessionId: string) => {
     navigate(`/browser/${sessionId}`)
@@ -71,9 +55,13 @@ export default function GenomesPage() {
     navigate(`/browser/${newSessionId}`)
   }
 
-  const handleGoPosition = () => {
-    // 占位符：后续实现位置跳转功能
-    console.log('Navigate to:', selectedAssembly, positionSearch)
+  const handleNavigate = (assembly: string, position?: string) => {
+    // 构建浏览器页面 URL
+    const params = new URLSearchParams({
+      assembly,
+      ...(position && { position }),
+    })
+    navigate(`/browser?${params.toString()}`)
   }
 
   return (
@@ -96,109 +84,8 @@ export default function GenomesPage() {
         </Button>
       </Box>
 
-      {/* 物种与位置查询区 */}
-      <Box
-        sx={{
-          border: 1,
-          borderColor: 'divider',
-          borderRadius: 2,
-          p: 3,
-          bgcolor: 'background.paper',
-          mb: 8,
-        }}
-      >
-        <Typography variant="h2" gutterBottom>
-          Select Species & Position
-        </Typography>
-
-        {/* 热门物种 */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="body1" fontWeight="medium" sx={{ mb: 1.5 }}>
-            Popular Species
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
-            {popularSpecies.map(species => (
-              <Chip
-                key={species}
-                label={species}
-                variant="outlined"
-                clickable
-                sx={{
-                  '&:hover': {
-                    borderColor: 'primary.main',
-                    bgcolor: 'action.hover',
-                  },
-                }}
-              />
-            ))}
-          </Box>
-        </Box>
-
-        {/* 基因组搜索 */}
-        <Box sx={{ mb: 3 }}>
-          <TextField
-            fullWidth
-            label="Search through thousands of genomes"
-            value={genomeSearch}
-            onChange={e => setGenomeSearch(e.target.value)}
-            placeholder="Search for genome assemblies..."
-            variant="outlined"
-          />
-        </Box>
-
-        {/* 位置搜索 */}
-        <Box>
-          <Typography variant="body1" fontWeight="medium" sx={{ mb: 1.5 }}>
-            Find Position
-          </Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 1.5,
-              alignItems: 'flex-start',
-              flexWrap: { xs: 'wrap', md: 'nowrap' },
-            }}
-          >
-            <FormControl sx={{ minWidth: { xs: '100%', md: 300 } }}>
-              <InputLabel id="assembly-select-label">Assembly</InputLabel>
-              <Select
-                labelId="assembly-select-label"
-                value={selectedAssembly}
-                label="Assembly"
-                onChange={e => setSelectedAssembly(e.target.value)}
-              >
-                <MenuItem value="hg38">
-                  Human Assembly Dec. 2013 (GRCh38/hg38)
-                </MenuItem>
-                <MenuItem value="hg19">
-                  Human Assembly Feb. 2009 (GRCh37/hg19)
-                </MenuItem>
-                <MenuItem value="mm10">
-                  Mouse Assembly Dec. 2011 (GRCm38/mm10)
-                </MenuItem>
-                <MenuItem value="mm9">
-                  Mouse Assembly July 2007 (NCBI37/mm9)
-                </MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              sx={{ flex: 1, minWidth: { xs: '100%', md: 200 } }}
-              value={positionSearch}
-              onChange={e => setPositionSearch(e.target.value)}
-              placeholder="Position/Search Term"
-              variant="outlined"
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleGoPosition}
-              sx={{ minWidth: 80, height: 56 }}
-            >
-              GO
-            </Button>
-          </Box>
-        </Box>
-      </Box>
+      {/* 使用新的 GenomeSelector */}
+      <GenomeSelector onNavigate={handleNavigate} />
 
       {/* 分割线 */}
       <Divider sx={{ my: 8 }} />
