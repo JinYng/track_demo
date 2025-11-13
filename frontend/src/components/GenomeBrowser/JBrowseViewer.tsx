@@ -5,14 +5,15 @@ import { readConfObject } from '@jbrowse/core/configuration'
 import { createJBrowseTheme } from '@jbrowse/core/ui'
 import { Box, ThemeProvider } from '@mui/material'
 import { observer } from 'mobx-react'
-import viewConfig from '../../config'
+import { getDefaultGenomeConfig } from '../../config/genomes'
 import CustomJBrowseLinearGenomeView from './CustomJBrowseLinearGenomeView'
 import SidebarModalWidget from './SidebarModalWidget'
 
 export const JBrowseViewer = observer(() => {
   // 使用 useState 来保持 viewState 的稳定性，避免每次渲染都重新创建
-  const [state] = useState(() =>
-    createViewState({
+  const [state] = useState(() => {
+    const viewConfig = getDefaultGenomeConfig()
+    return createViewState({
       assembly: viewConfig.assembly,
       tracks: viewConfig.tracks,
       location: viewConfig.location,
@@ -21,8 +22,8 @@ export const JBrowseViewer = observer(() => {
         theme: viewConfig.theme,
         ...viewConfig.configuration,
       },
-    }),
-  )
+    })
+  })
 
   // 侧边栏宽度状态（默认 500px，最小 300px，最大 800px）
   const [sidebarWidth, setSidebarWidth] = useState(400)

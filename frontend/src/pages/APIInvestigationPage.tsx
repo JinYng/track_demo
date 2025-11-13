@@ -7,7 +7,7 @@ import {
   getAvailableTracks,
   getDisplayedTracks,
 } from '../utils/jbrowseApiInvestigation'
-import viewConfig from '../config'
+import { getDefaultGenomeConfig } from '../config/genomes'
 
 export default function APIInvestigationPage() {
   const { theme } = useTheme()
@@ -19,6 +19,7 @@ export default function APIInvestigationPage() {
   useEffect(() => {
     try {
       // 创建 viewState
+      const viewConfig = getDefaultGenomeConfig()
       const state = createViewState({
         assembly: viewConfig.assembly,
         tracks: viewConfig.tracks,
@@ -60,7 +61,9 @@ export default function APIInvestigationPage() {
         minHeight: '100vh',
       }}
     >
-      <h1 style={{ marginBottom: theme.spacing.lg }}>JBrowse API Investigation Report</h1>
+      <h1 style={{ marginBottom: theme.spacing.lg }}>
+        JBrowse API Investigation Report
+      </h1>
 
       {error && (
         <div style={{ color: '#ff6b6b', marginBottom: theme.spacing.lg }}>
@@ -70,31 +73,67 @@ export default function APIInvestigationPage() {
 
       {/* 轨道方法测试结果 */}
       {trackMethods && (
-        <section style={{ marginBottom: theme.spacing.xl, padding: theme.spacing.md, border: `1px solid ${theme.colors.border}` }}>
-          <h2 style={{ marginBottom: theme.spacing.md }}>Track Control Methods</h2>
+        <section
+          style={{
+            marginBottom: theme.spacing.xl,
+            padding: theme.spacing.md,
+            border: `1px solid ${theme.colors.border}`,
+          }}
+        >
+          <h2 style={{ marginBottom: theme.spacing.md }}>
+            Track Control Methods
+          </h2>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <tbody>
               <tr style={{ borderBottom: `1px solid ${theme.colors.border}` }}>
-                <td style={{ padding: theme.spacing.sm }}>showTrack() available:</td>
-                <td style={{ padding: theme.spacing.sm, color: trackMethods.canShowTrack ? '#51cf66' : '#ff6b6b' }}>
+                <td style={{ padding: theme.spacing.sm }}>
+                  showTrack() available:
+                </td>
+                <td
+                  style={{
+                    padding: theme.spacing.sm,
+                    color: trackMethods.canShowTrack ? '#51cf66' : '#ff6b6b',
+                  }}
+                >
                   {trackMethods.canShowTrack ? '✅ YES' : '❌ NO'}
                 </td>
               </tr>
               <tr style={{ borderBottom: `1px solid ${theme.colors.border}` }}>
-                <td style={{ padding: theme.spacing.sm }}>hideTrack() available:</td>
-                <td style={{ padding: theme.spacing.sm, color: trackMethods.canHideTrack ? '#51cf66' : '#ff6b6b' }}>
+                <td style={{ padding: theme.spacing.sm }}>
+                  hideTrack() available:
+                </td>
+                <td
+                  style={{
+                    padding: theme.spacing.sm,
+                    color: trackMethods.canHideTrack ? '#51cf66' : '#ff6b6b',
+                  }}
+                >
                   {trackMethods.canHideTrack ? '✅ YES' : '❌ NO'}
                 </td>
               </tr>
               <tr style={{ borderBottom: `1px solid ${theme.colors.border}` }}>
-                <td style={{ padding: theme.spacing.sm }}>getTrack() available:</td>
-                <td style={{ padding: theme.spacing.sm, color: trackMethods.canGetTrack ? '#51cf66' : '#ff6b6b' }}>
+                <td style={{ padding: theme.spacing.sm }}>
+                  getTrack() available:
+                </td>
+                <td
+                  style={{
+                    padding: theme.spacing.sm,
+                    color: trackMethods.canGetTrack ? '#51cf66' : '#ff6b6b',
+                  }}
+                >
                   {trackMethods.canGetTrack ? '✅ YES' : '❌ NO'}
                 </td>
               </tr>
               <tr style={{ borderBottom: `1px solid ${theme.colors.border}` }}>
-                <td style={{ padding: theme.spacing.sm }}>addTrackConf() available:</td>
-                <td style={{ padding: theme.spacing.sm, color: trackMethods.canAddTrack ? '#51cf66' : '#ff6b6b' }}>
+                <td style={{ padding: theme.spacing.sm }}>
+                  addTrackConf() available:
+                </td>
+                <td
+                  style={{
+                    padding: theme.spacing.sm,
+                    color: trackMethods.canAddTrack ? '#51cf66' : '#ff6b6b',
+                  }}
+                >
                   {trackMethods.canAddTrack ? '✅ YES' : '❌ NO'}
                 </td>
               </tr>
@@ -115,8 +154,16 @@ export default function APIInvestigationPage() {
 
       {/* 可用轨道 */}
       {availableTracks.length > 0 && (
-        <section style={{ marginBottom: theme.spacing.xl, padding: theme.spacing.md, border: `1px solid ${theme.colors.border}` }}>
-          <h2 style={{ marginBottom: theme.spacing.md }}>Available Tracks ({availableTracks.length})</h2>
+        <section
+          style={{
+            marginBottom: theme.spacing.xl,
+            padding: theme.spacing.md,
+            border: `1px solid ${theme.colors.border}`,
+          }}
+        >
+          <h2 style={{ marginBottom: theme.spacing.md }}>
+            Available Tracks ({availableTracks.length})
+          </h2>
           <div
             style={{
               maxHeight: '400px',
@@ -135,8 +182,16 @@ export default function APIInvestigationPage() {
 
       {/* ViewState 结构 */}
       {reportData && (
-        <section style={{ marginBottom: theme.spacing.xl, padding: theme.spacing.md, border: `1px solid ${theme.colors.border}` }}>
-          <h2 style={{ marginBottom: theme.spacing.md }}>ViewState Structure</h2>
+        <section
+          style={{
+            marginBottom: theme.spacing.xl,
+            padding: theme.spacing.md,
+            border: `1px solid ${theme.colors.border}`,
+          }}
+        >
+          <h2 style={{ marginBottom: theme.spacing.md }}>
+            ViewState Structure
+          </h2>
           <div
             style={{
               maxHeight: '600px',
@@ -153,7 +208,13 @@ export default function APIInvestigationPage() {
         </section>
       )}
 
-      <div style={{ marginTop: theme.spacing.lg, fontSize: theme.fontSizes.caption, color: theme.colors.secondaryText }}>
+      <div
+        style={{
+          marginTop: theme.spacing.lg,
+          fontSize: theme.fontSizes.caption,
+          color: theme.colors.secondaryText,
+        }}
+      >
         <p>Check your browser console (F12) for additional debugging output.</p>
       </div>
     </div>
