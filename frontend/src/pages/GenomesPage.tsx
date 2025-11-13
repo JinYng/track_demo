@@ -1,53 +1,18 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { Box, Typography, Button, Grid, Divider } from '@mui/material'
+import { Box, Typography, Button, Divider } from '@mui/material'
 import { PageLayout } from '../components/layout/PageLayout/PageLayout'
-import { SessionCard } from '../components/ui/SessionCard/SessionCard'
 import { CreateAnalysisModal } from '../components/SessionSetup'
 import { GenomeSelector } from '../components/GenomeSelector'
-
-interface Session {
-  id: string
-  name: string
-  organism: string
-  genome: string
-  lastOpen: string
-}
-
-// 模拟数据
-const mockSessions: Session[] = [
-  {
-    id: '1',
-    name: 'Patient A WES Variant Screening',
-    organism: 'Human',
-    genome: 'hg38',
-    lastOpen: '2 hours ago',
-  },
-  {
-    id: '2',
-    name: 'TP53 Region Analysis',
-    organism: 'Human',
-    genome: 'hg38',
-    lastOpen: '1 day ago',
-  },
-  {
-    id: '3',
-    name: 'Mouse Knockout Study',
-    organism: 'Mouse',
-    genome: 'mm10',
-    lastOpen: '3 days ago',
-  },
-]
+import { EXAMPLE_CASES } from '../data/exampleCases'
+import { ExampleAnalyses } from '../components/ExampleAnalyses'
+import { AnalysisCase } from '../types/analysisCase'
 
 export default function GenomesPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [showWizard, setShowWizard] = useState(false)
-
-  const handleOpenSession = (sessionId: string) => {
-    navigate(`/browser/${sessionId}`)
-  }
 
   const handleCreateSession = (_sessionData: any) => {
     // 创建新会话并导航到浏览器页面
@@ -62,6 +27,26 @@ export default function GenomesPage() {
       ...(position && { position }),
     })
     navigate(`/browser?${params.toString()}`)
+  }
+
+  const handleCaseClick = (analysisCase: AnalysisCase) => {
+    // 构建浏览器页面 URL，传递案例配置
+    const params = new URLSearchParams({
+      assembly: analysisCase.assemblyId,
+      position: analysisCase.targetPosition,
+    })
+    navigate(`/browser?${params.toString()}`)
+  }
+
+  const handleImportClick = () => {
+    // TODO: Implement import session functionality
+    // Future implementation should:
+    // 1. Open a file picker dialog to select JSON session files
+    // 2. Parse and validate the session configuration file
+    // 3. Extract assembly, position, and other session parameters
+    // 4. Navigate to browser page with the imported session configuration
+    // 5. Handle errors gracefully (invalid file format, missing fields, etc.)
+    console.log('Import session clicked - placeholder functionality')
   }
 
   return (
@@ -90,30 +75,12 @@ export default function GenomesPage() {
       {/* 分割线 */}
       <Divider sx={{ my: 8 }} />
 
-      {/* 最近会话 */}
-      <Box component="section">
-        <Typography variant="h2" gutterBottom>
-          {t('dashboard.recentSessions')}
-        </Typography>
-
-        <Grid container spacing={2} sx={{ mb: 3 }}>
-          {mockSessions.map(session => (
-            <Grid item xs={12} sm={6} md={4} key={session.id}>
-              <SessionCard
-                name={session.name}
-                organism={session.organism}
-                genome={session.genome}
-                lastOpen={session.lastOpen}
-                onClick={() => handleOpenSession(session.id)}
-              />
-            </Grid>
-          ))}
-        </Grid>
-
-        <Button variant="text" color="primary">
-          {t('dashboard.importSession')}
-        </Button>
-      </Box>
+      {/* Example Analyses */}
+      <ExampleAnalyses
+        cases={EXAMPLE_CASES}
+        onCaseClick={handleCaseClick}
+        onImportClick={handleImportClick}
+      />
 
       {/* 页脚 */}
       <Box
