@@ -15,6 +15,18 @@ function validateAnalysisCase(analysisCase: AnalysisCase): boolean {
  * These cases showcase different features and use cases of the platform
  */
 export const EXAMPLE_CASES: AnalysisCase[] = [
+    /**
+     * Demo analysis case showcasing the complete genome browser functionality
+     * Includes 5 pre-loaded tracks at a meaningful genomic location
+     */
+    {
+        id: 'demo-hg38-default',
+        title: 'Human Genome Browser Demo',
+        speciesName: 'Human',
+        assemblyId: 'hg38',
+        targetPosition: 'chr10:29838565-29838850',
+        description: 'Complete demonstration of genome browser features with 5 pre-loaded tracks: reference sequence, gene annotations, conservation scores, variants, and alignments',
+    },
     {
         id: 'case-wes-variant',
         title: 'Patient A WES Variant Screening',

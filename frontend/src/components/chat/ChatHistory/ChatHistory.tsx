@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
+import { Box, Typography } from '@mui/material'
 import { MessageBubble, Message } from '../../ui/MessageBubble'
 import { ThinkingIndicator } from '../../ui/ThinkingIndicator'
-import './ChatHistory.css'
 
 interface ChatHistoryProps {
   messages: Message[]
@@ -19,16 +19,57 @@ export function ChatHistory({ messages, isLoading = false }: ChatHistoryProps) {
   }, [messages, isLoading])
 
   return (
-    <div ref={scrollRef} className="chat-history">
+    <Box
+      ref={scrollRef}
+      sx={{
+        flex: 1,
+        overflowY: 'auto',
+        py: 2,
+        backgroundColor: 'background.paper',
+        '&::-webkit-scrollbar': {
+          width: '8px',
+        },
+        '&::-webkit-scrollbar-track': {
+          backgroundColor: 'transparent',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: 'rgba(0,0,0,0.2)',
+          borderRadius: '4px',
+          '&:hover': {
+            backgroundColor: 'rgba(0,0,0,0.3)',
+          },
+        },
+      }}
+    >
       {messages.length === 0 ? (
-        <div className="chat-history__empty">
-          <div className="chat-history__empty-title">AI Genomics Assistant</div>
-          <div className="chat-history__empty-subtitle">
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+            textAlign: 'center',
+            px: 4,
+          }}
+        >
+          <Typography
+            variant="h6"
+            color="text.secondary"
+            sx={{ mb: 1, fontWeight: 500 }}
+          >
+            AI Genomics Assistant
+          </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ lineHeight: 1.6 }}
+          >
             Start chatting with AI to explore genomic data
             <br />
             Example: Show me the location of BRCA1 gene
-          </div>
-        </div>
+          </Typography>
+        </Box>
       ) : (
         <>
           {messages.map(message => (
@@ -37,6 +78,6 @@ export function ChatHistory({ messages, isLoading = false }: ChatHistoryProps) {
           {isLoading && <ThinkingIndicator />}
         </>
       )}
-    </div>
+    </Box>
   )
 }

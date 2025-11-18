@@ -1,4 +1,23 @@
 import { useState } from 'react'
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  IconButton,
+  InputAdornment,
+  Box,
+  Typography,
+  Chip,
+} from '@mui/material'
+import {
+  Close as CloseIcon,
+  Visibility,
+  VisibilityOff,
+  Settings as SettingsIcon,
+} from '@mui/icons-material'
 import './ModelConfiguration.css'
 
 interface ModelConfig {
@@ -24,6 +43,7 @@ export function ModelConfiguration({
 }: ModelConfigurationProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [tempConfig, setTempConfig] = useState<ModelConfig>(config)
+  const [showApiKey, setShowApiKey] = useState(false)
 
   const handleSave = async () => {
     onConfigChange(tempConfig)
@@ -37,6 +57,11 @@ export function ModelConfiguration({
   }
 
   const handleCancel = () => {
+    setTempConfig(config) // 重置为原始配置
+    setIsModalOpen(false)
+  }
+
+  const handleClose = () => {
     setTempConfig(config) // 重置为原始配置
     setIsModalOpen(false)
   }
@@ -56,97 +81,169 @@ export function ModelConfiguration({
     }
   }
 
+  const getStatusColor = (
+    status: ConnectionStatus,
+  ): 'default' | 'warning' | 'success' | 'error' => {
+    switch (status) {
+      case 'idle':
+        return 'default'
+      case 'testing':
+        return 'warning'
+      case 'success':
+        return 'success'
+      case 'error':
+        return 'error'
+      default:
+        return 'default'
+    }
+  }
+
   return (
     <>
       {/* 模型配置按钮 */}
-      <div
+      <Box
         className="model-config__trigger"
         onClick={() => setIsModalOpen(true)}
+        sx={{
+          padding: '12px 16px',
+          borderBottom: '1px solid #e0e0e0',
+          cursor: 'pointer',
+          backgroundColor: '#f8f9fa',
+          transition: 'background-color 0.2s',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          '&:hover': {
+            backgroundColor: '#e9ecef',
+          },
+        }}
       >
-        <div>
-          <div className="model-config__title">Model Settings</div>
-          <div className="model-config__subtitle">
+        <Box>
+          <Typography variant="body2" fontWeight={500}>
+            Model Settings
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
             {config.modelName || 'Not configured'}
-          </div>
-        </div>
-        <div className="model-config__status">
-          <div
-            className={`model-config__indicator model-config__indicator--${connectionStatus}`}
-            title={getStatusText(connectionStatus)}
+          </Typography>
+        </Box>
+        <Box display="flex" alignItems="center" gap={1}>
+          <Chip
+            label={getStatusText(connectionStatus)}
+            size="small"
+            color={getStatusColor(connectionStatus)}
+            sx={{ height: 20, fontSize: '0.7rem' }}
           />
-          <div className="model-config__icon">Settings</div>
-        </div>
-      </div>
+          <SettingsIcon fontSize="small" sx={{ color: 'text.secondary' }} />
+        </Box>
+      </Box>
 
-      {/* Configuration modal */}
-      {isModalOpen && (
-        <div
-          className="model-config__overlay"
-          onClick={e => {
-            if (e.target === e.currentTarget) {
-              handleCancel()
-            }
+      {/* Configuration Dialog */}
+      <Dialog
+        open={isModalOpen}
+        onClose={(event, reason) => {
+          // 禁用点击外侧和按 ESC 关闭
+          if (reason === 'backdropClick' || reason === 'escapeKeyDown') {
+            return
+          }
+          handleClose()
+        }}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            pb: 1,
           }}
         >
-          <div className="model-config__modal">
-            <h3 className="model-config__modal-title">Model Configuration</h3>
+          Model Configuration
+          <IconButton
+            aria-label="close"
+            onClick={handleClose}
+            size="small"
+            sx={{
+              color: 'text.secondary',
+              '&:hover': {
+                backgroundColor: 'action.hover',
+              },
+            }}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </DialogTitle>
 
-            <div className="model-config__field">
-              <label className="model-config__label">API Base URL</label>
-              <input
-                type="text"
-                className="model-config__input"
-                value={tempConfig.apiBaseUrl}
-                onChange={e =>
-                  setTempConfig({ ...tempConfig, apiBaseUrl: e.target.value })
-                }
-                placeholder="https://api.openai.com/v1"
-              />
-            </div>
+        <DialogContent dividers>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+            <TextField
+              label="API Base URL"
+              fullWidth
+              value={tempConfig.apiBaseUrl}
+              onChange={e =>
+                setTempConfig({ ...tempConfig, apiBaseUrl: e.target.value })
+              }
+              placeholder="https://api.openai.com/v1"
+              size="small"
+              helperText="The base URL for your AI model API"
+            />
 
-            <div className="model-config__field">
-              <label className="model-config__label">API Key</label>
-              <input
-                type="password"
-                className="model-config__input"
-                value={tempConfig.apiKey}
-                onChange={e =>
-                  setTempConfig({ ...tempConfig, apiKey: e.target.value })
-                }
-                placeholder="sk-..."
-              />
-            </div>
+            <TextField
+              label="API Key"
+              fullWidth
+              type={showApiKey ? 'text' : 'password'}
+              value={tempConfig.apiKey}
+              onChange={e =>
+                setTempConfig({ ...tempConfig, apiKey: e.target.value })
+              }
+              placeholder="sk-..."
+              size="small"
+              helperText="Your API key will be stored securely"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={() => setShowApiKey(!showApiKey)}
+                      onMouseDown={e => e.preventDefault()}
+                      edge="end"
+                      size="small"
+                    >
+                      {showApiKey ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
 
-            <div className="model-config__field">
-              <label className="model-config__label">Model Name</label>
-              <input
-                type="text"
-                className="model-config__input"
-                value={tempConfig.modelName}
-                onChange={e =>
-                  setTempConfig({ ...tempConfig, modelName: e.target.value })
-                }
-                placeholder="gpt-4"
-              />
-            </div>
+            <TextField
+              label="Model Name"
+              fullWidth
+              value={tempConfig.modelName}
+              onChange={e =>
+                setTempConfig({ ...tempConfig, modelName: e.target.value })
+              }
+              placeholder="gpt-4"
+              size="small"
+              helperText="The name of the AI model to use"
+            />
+          </Box>
+        </DialogContent>
 
-            <div className="model-config__actions">
-              <button
-                className="model-config__button model-config__button--secondary"
-                onClick={handleCancel}
-              >
-                Cancel
-              </button>
-              <button
-                className="model-config__button model-config__button--primary"
-                onClick={handleSave}
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button onClick={handleCancel} variant="outlined" color="inherit">
+            Cancel
+          </Button>
+          <Button onClick={handleSave} variant="contained" color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   )
 }

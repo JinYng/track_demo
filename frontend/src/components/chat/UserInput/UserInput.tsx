@@ -1,5 +1,6 @@
-import { useState, useRef, KeyboardEvent } from 'react'
-import './UserInput.css'
+import { useState, KeyboardEvent } from 'react'
+import { Box, TextField, IconButton, Typography, Paper } from '@mui/material'
+import { Send as SendIcon } from '@mui/icons-material'
 
 interface UserInputProps {
   onSendMessage: (message: string) => void
@@ -8,21 +9,16 @@ interface UserInputProps {
 
 export function UserInput({ onSendMessage, disabled = false }: UserInputProps) {
   const [message, setMessage] = useState('')
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const handleSend = () => {
     const trimmedMessage = message.trim()
     if (trimmedMessage && !disabled) {
       onSendMessage(trimmedMessage)
       setMessage('')
-      // 重置textarea高度
-      if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto'
-      }
     }
   }
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter') {
       if (e.ctrlKey || e.metaKey) {
         // Ctrl+Enter 或 Cmd+Enter 发送消息
@@ -36,44 +32,94 @@ export function UserInput({ onSendMessage, disabled = false }: UserInputProps) {
     }
   }
 
-  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMessage(e.target.value)
-
-    // 自动调整高度
-    const textarea = e.target
-    textarea.style.height = 'auto'
-    const newHeight = Math.min(textarea.scrollHeight, 120) // 最大高度120px
-    textarea.style.height = `${newHeight}px`
-  }
-
   return (
-    <div className="user-input">
-      <div className="user-input__container">
-        <textarea
-          ref={textareaRef}
-          className="user-input__textarea"
+    <Box
+      sx={{
+        padding: 2,
+        borderTop: '1px solid',
+        borderColor: 'divider',
+        backgroundColor: 'grey.50',
+      }}
+    >
+      <Paper
+        elevation={1}
+        sx={{
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: 1.5,
+          padding: 1.5,
+          borderRadius: 3,
+          backgroundColor: 'background.paper',
+        }}
+      >
+        <TextField
+          fullWidth
+          multiline
+          maxRows={5}
           value={message}
-          onChange={handleTextareaChange}
+          onChange={e => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Ask about genomics data... (Enter to send, Shift+Enter for new line)"
+          placeholder="Ask about genomics data..."
           disabled={disabled}
+          variant="standard"
+          InputProps={{
+            disableUnderline: true,
+            sx: {
+              fontSize: '14px',
+              '& textarea': {
+                '&::-webkit-scrollbar': {
+                  width: '6px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  backgroundColor: 'rgba(0,0,0,0.2)',
+                  borderRadius: '3px',
+                },
+              },
+            },
+          }}
+          sx={{
+            '& .MuiInputBase-root': {
+              padding: 0,
+            },
+          }}
         />
 
-        <button
-          className={`user-input__button ${message.trim() && !disabled
-              ? 'user-input__button--active'
-              : 'user-input__button--disabled'
-            }`}
+        <IconButton
+          color="primary"
           onClick={handleSend}
           disabled={!message.trim() || disabled}
+          size="small"
+          sx={{
+            backgroundColor:
+              message.trim() && !disabled ? 'primary.main' : 'grey.300',
+            color: message.trim() && !disabled ? 'white' : 'grey.500',
+            '&:hover': {
+              backgroundColor:
+                message.trim() && !disabled ? 'primary.dark' : 'grey.300',
+            },
+            '&.Mui-disabled': {
+              backgroundColor: 'grey.300',
+              color: 'grey.500',
+            },
+            width: 36,
+            height: 36,
+          }}
         >
-          {disabled ? '...' : 'Send'}
-        </button>
-      </div>
+          <SendIcon fontSize="small" />
+        </IconButton>
+      </Paper>
 
-      <div className="user-input__hint">
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{
+          display: 'block',
+          textAlign: 'center',
+          mt: 1,
+        }}
+      >
         Enter to send • Shift+Enter for new line • Ctrl+Enter to force send
-      </div>
-    </div>
+      </Typography>
+    </Box>
   )
 }
