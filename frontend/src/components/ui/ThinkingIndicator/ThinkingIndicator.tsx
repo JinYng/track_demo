@@ -1,70 +1,54 @@
-import { Box, Paper, Avatar, keyframes } from '@mui/material'
-import { SmartToy as BotIcon } from '@mui/icons-material'
-
-const bounce = keyframes`
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-`
+import { Box, Typography, Skeleton } from '@mui/material'
 
 export function ThinkingIndicator() {
   return (
     <Box
       sx={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        mb: 2,
-        px: 2,
+        py: 3,
+        px: 4,
+        borderBottom: '1px solid',
+        borderColor: 'divider',
       }}
     >
-      <Box
+      {/* Role Label */}
+      <Typography
+        variant="caption"
         sx={{
-          display: 'flex',
-          gap: 1,
-          alignItems: 'flex-start',
+          display: 'block',
+          mb: 1.5,
+          fontWeight: 600,
+          color: 'text.secondary',
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px',
+          fontSize: '0.75rem',
         }}
       >
-        {/* AI Avatar */}
-        <Avatar
-          sx={{
-            width: 32,
-            height: 32,
-            backgroundColor: 'secondary.main',
-            fontSize: '1rem',
-          }}
-        >
-          <BotIcon fontSize="small" />
-        </Avatar>
+        Model
+      </Typography>
 
-        {/* Thinking Dots */}
-        <Paper
-          elevation={1}
-          sx={{
-            borderRadius: '18px 18px 18px 4px',
-            padding: '12px 18px',
-            backgroundColor: 'grey.100',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 0.75,
-          }}
-        >
-          {[0, 0.2, 0.4].map((delay, index) => (
-            <Box
-              key={index}
-              sx={{
-                width: 8,
-                height: 8,
-                backgroundColor: 'grey.500',
-                borderRadius: '50%',
-                animation: `${bounce} 1.3s ease-in-out infinite`,
-                animationDelay: `${delay}s`,
-              }}
-            />
-          ))}
-        </Paper>
+      {/* Thinking Animation */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Skeleton
+          variant="text"
+          width="60%"
+          height={20}
+          animation="wave"
+          sx={{ fontSize: '0.8rem' }}
+        />
+        <Skeleton
+          variant="text"
+          width="80%"
+          height={20}
+          animation="wave"
+          sx={{ fontSize: '0.8rem' }}
+        />
+        <Skeleton
+          variant="text"
+          width="40%"
+          height={20}
+          animation="wave"
+          sx={{ fontSize: '0.8rem' }}
+        />
       </Box>
     </Box>
   )
