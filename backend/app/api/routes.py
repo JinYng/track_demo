@@ -35,6 +35,56 @@ async def get_genomics_info():
         ]
     }
 
+@api_router.get("/ai/default-config")
+async def get_default_ai_config():
+    """获取默认的AI模型配置（保持向后兼容）"""
+    from app.core.config import settings
+    
+    return {
+        "apiBaseUrl": settings.MODELSCOPE_API_BASE_URL,
+        "apiKey": settings.MODELSCOPE_API_KEY,
+        "modelName": settings.MODELSCOPE_MODEL_NAME,
+        "provider": "ModelScope"
+    }
+
+@api_router.get("/ai/preset-configs")
+async def get_preset_configs():
+    """获取所有预设的AI模型配置"""
+    from app.core.config import settings
+    
+    presets = []
+    
+    # ModelScope 配置
+    if settings.MODELSCOPE_API_KEY:
+        presets.append({
+            "id": "modelscope",
+            "name": "ModelScope",
+            "description": "Qwen Vision Language Model",
+            "apiBaseUrl": settings.MODELSCOPE_API_BASE_URL,
+            "apiKey": settings.MODELSCOPE_API_KEY,
+            "modelName": settings.MODELSCOPE_MODEL_NAME,
+            "provider": "ModelScope",
+            "isConfigured": True
+        })
+    
+    # Groq 配置
+    if settings.GROQ_API_KEY:
+        presets.append({
+            "id": "groq",
+            "name": "Groq",
+            "description": "Fast inference with Llama",
+            "apiBaseUrl": settings.GROQ_API_BASE_URL,
+            "apiKey": settings.GROQ_API_KEY,
+            "modelName": settings.GROQ_MODEL_NAME,
+            "provider": "Groq",
+            "isConfigured": True
+        })
+    
+    return {
+        "presets": presets,
+        "count": len(presets)
+    }
+
 @api_router.post("/ai/test-config")
 async def test_ai_config(config: ModelConfigRequest):
     """测试AI模型配置"""

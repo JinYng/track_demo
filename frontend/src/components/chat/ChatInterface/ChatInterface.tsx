@@ -4,6 +4,7 @@ import { ChatHistory } from '../ChatHistory'
 import { UserInput } from '../UserInput'
 import { Message } from '../../ui/MessageBubble'
 import { websocketService } from '../../../services/websocket'
+import { API_ENDPOINTS, apiClient } from '../../../config/api'
 import './ChatInterface.css'
 
 // 应用配置接口 - 用于UI显示和连接配置
@@ -25,9 +26,9 @@ interface ChatInterfaceProps {
 export function ChatInterface({ viewState: _viewState }: ChatInterfaceProps) {
   // 应用配置状态 - 用于UI显示和API连接
   const [appConfig, setAppConfig] = useState<AppConfig>({
-    apiBaseUrl: 'https://api-inference.modelscope.cn/v1',
-    apiKey: 'ms-02d3cecc-80df-47ed-b6e8-811865cb55e6', // 默认使用测试模式
-    modelName: 'Qwen/Qwen3-VL-8B-Instruct',
+    apiBaseUrl: '',
+    apiKey: '',
+    modelName: '',
   })
 
   // 聊天状态 - 仅包含纯粹的对话历史
@@ -40,15 +41,10 @@ export function ChatInterface({ viewState: _viewState }: ChatInterfaceProps) {
   const [connectionStatus, setConnectionStatus] = useState<
     'idle' | 'testing' | 'success' | 'error'
   >('idle')
+  const [isLoadingConfig, setIsLoadingConfig] = useState(true)
 
   // WebSocket消息处理器
   const handleWebSocketMessage = useCallback((response: any) => {
-    // Handle connection test response
-    if (response.type === 'test_connection_result') {
-      setConnectionStatus(response.success ? 'success' : 'error')
-      return
-    }
-
     // Handle AI response
     let content = 'Response received'
 
@@ -60,6 +56,9 @@ export function ChatInterface({ viewState: _viewState }: ChatInterfaceProps) {
     } else if (response.content) {
       content = response.content
     }
+
+    // 如果收到响应，说明连接成功
+    setConnectionStatus('success')
 
     const aiMessage: Message = {
       id: Date.now().toString(),
@@ -83,8 +82,52 @@ export function ChatInterface({ viewState: _viewState }: ChatInterfaceProps) {
     }
   }, [])
 
+  // 加载默认配置
+  useEffect(() => {
+    const loadDefaultConfig = async () => {
+      try {
+        const config = await apiClient.get<{
+          apiBaseUrl: string
+          apiKey: string
+          modelName: string
+          provider: string
+        }>(API_ENDPOINTS.AI_DEFAULT_CONFIG)
+
+        setAppConfig({
+          apiBaseUrl: config.apiBaseUrl,
+          apiKey: config.apiKey,
+          modelName: config.modelName,
+        })
+        console.log(
+          '✅ 已加载默认配置:',
+          config.provider,
+          '-',
+          config.modelName,
+        )
+      } catch (error) {
+        console.error('❌ 加载配置失败:', error)
+        // 使用备用配置
+        setAppConfig({
+          apiBaseUrl: 'https://api-inference.modelscope.cn/v1',
+          apiKey: 'test-key',
+          modelName: 'Qwen/Qwen3-VL-8B-Instruct',
+        })
+        console.log('⚠️ 使用备用测试配置')
+      } finally {
+        setIsLoadingConfig(false)
+      }
+    }
+
+    loadDefaultConfig()
+  }, [])
+
   // 初始化WebSocket连接
   useEffect(() => {
+    // 等待配置加载完成
+    if (isLoadingConfig) {
+      return
+    }
+
     const initWebSocket = async () => {
       try {
         await websocketService.connect()
@@ -111,36 +154,14 @@ export function ChatInterface({ viewState: _viewState }: ChatInterfaceProps) {
       websocketService.removeConnectionHandler(handleConnectionChange)
       websocketService.disconnect()
     }
-  }, [handleWebSocketMessage, handleConnectionChange])
+  }, [handleWebSocketMessage, handleConnectionChange, isLoadingConfig])
 
   const handleTestConnection = useCallback(
-    async (config: AppConfig): Promise<boolean> => {
-      if (!websocketService.isConnected()) {
-        setConnectionStatus('error')
-        return false
-      }
-
-      setConnectionStatus('testing')
-
-      try {
-        const testMessage = {
-          type: 'test_connection',
-          config: {
-            apiBaseUrl: config.apiBaseUrl,
-            apiKey: config.apiKey,
-            modelName: config.modelName,
-          },
-        }
-
-        await websocketService.sendMessage(JSON.stringify(testMessage), config)
-
-        // 等待响应（通过handleWebSocketMessage处理）
-        return true
-      } catch (error) {
-        console.error('连接测试失败:', error)
-        setConnectionStatus('error')
-        return false
-      }
+    async (_config: AppConfig): Promise<boolean> => {
+      // 不进行实际测试，只重置状态
+      // 用户第一次发送消息时会自动验证配置
+      setConnectionStatus('idle')
+      return true
     },
     [],
   )
