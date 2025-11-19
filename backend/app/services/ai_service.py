@@ -1,10 +1,15 @@
 from langchain_openai import ChatOpenAI
-from langchain.schema import HumanMessage, SystemMessage
-from typing import Dict, Any, List
+from langchain.schema import HumanMessage, SystemMessage, AIMessage
+from typing import Dict, Any, List, Optional
+from fastapi import WebSocket
 import logging
 from datetime import datetime
+import json
+import uuid
 
 from app.tools.jbrowse_tools import JBrowseToolkit
+from app.tools.jbrowse_langchain_tools import JBROWSE_TOOLS
+from app.tools.navigation_tool import NavigationTool
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +18,8 @@ class AIService:
     
     def __init__(self):
         self.jbrowse_toolkit = JBrowseToolkit()
+        self.navigation_tool = NavigationTool()
+        self.tools = JBROWSE_TOOLS
         self.system_prompt = self._create_system_prompt()
     
     def _create_system_prompt(self) -> str:
@@ -25,15 +32,22 @@ class AIService:
 4. 生物学概念解释
 
 可用工具：
-- navigate_to_locus: 导航到指定基因位点
-- get_gene_info: 获取基因详细信息
-- search_variants: 搜索遗传变异
-- explain_genomic_region: 解释基因组区域功能
+- navigate_jbrowse: 导航到指定基因组位置（染色体:起始-结束）
+- navigate_to_gene: 通过基因名称导航到基因位置
+- get_navigation_history: 查看最近的导航历史
+
+当用户想要查看特定基因组区域或基因时，请使用相应的导航工具。
+工具会自动处理不同的染色体命名格式（chr1 vs 1）。
 
 请用专业但易懂的语言回答用户的基因组学问题，并在需要时调用相应的工具来辅助分析。"""
     
-    async def process_query(self, query: str, ai_model_config: Dict[str, Any]) -> Dict[str, Any]:
-        """处理AI查询"""
+    async def process_query(
+        self, 
+        query: str, 
+        ai_model_config: Dict[str, Any],
+        websocket: Optional[WebSocket] = None
+    ) -> Dict[str, Any]:
+        """处理AI查询（带工具调用支持）"""
         try:
             logger.info(f"Processing query: {query[:100]}...")
             
@@ -53,13 +67,16 @@ class AIService:
                     "error": "missing_api_key"
                 }
             
-            # 创建LangChain ChatOpenAI实例
+            # 创建LangChain ChatOpenAI实例并绑定工具
             llm = ChatOpenAI(
                 base_url=api_base_url,
                 api_key=api_key,
                 model=model_name,
                 temperature=0.1
             )
+            
+            # 绑定工具到 LLM
+            llm_with_tools = llm.bind_tools(self.tools)
             
             # 准备消息
             messages = [
@@ -68,26 +85,60 @@ class AIService:
             ]
             
             # 调用AI模型
-            response = await llm.ainvoke(messages)
+            response = await llm_with_tools.ainvoke(messages)
             
-            # 检查是否需要调用工具
-            tool_actions = self._extract_tool_actions(response.content)
-            
-            # 执行工具操作
+            # 检查是否有工具调用
+            tool_calls = getattr(response, 'tool_calls', [])
             tool_results = []
-            for action in tool_actions:
-                result = await self._execute_tool_action(action)
-                tool_results.append(result)
+            
+            if tool_calls:
+                logger.info(f"LLM requested {len(tool_calls)} tool calls")
+                
+                # 执行所有工具调用
+                for tool_call in tool_calls:
+                    tool_name = tool_call.get('name')
+                    tool_args = tool_call.get('args', {})
+                    
+                    logger.info(f"Executing tool: {tool_name} with args: {tool_args}")
+                    
+                    # 查找并执行工具
+                    tool_result = await self._execute_langchain_tool(tool_name, tool_args)
+                    tool_results.append({
+                        "tool": tool_name,
+                        "args": tool_args,
+                        "result": tool_result
+                    })
+                    
+                    # 如果是导航工具，发送导航指令到前端
+                    if websocket and tool_name in ['navigate_jbrowse', 'navigate_to_gene']:
+                        await self._send_navigation_command(websocket, tool_name, tool_args, tool_result)
+                
+                # 构建工具结果摘要
+                tool_results_text = "\n\n".join([
+                    f"Tool: {tr['tool']}\nResult: {tr['result']}"
+                    for tr in tool_results
+                ])
+                
+                # 将工具结果添加到消息历史
+                messages.append(AIMessage(content=response.content))
+                messages.append(HumanMessage(content=f"Tool execution results:\n{tool_results_text}\n\nPlease provide a final response to the user based on these results."))
+                
+                # 再次调用 LLM 生成最终回复
+                final_response = await llm.ainvoke(messages)
+                response_content = final_response.content
+            else:
+                response_content = response.content
             
             return {
-                "content": response.content,
+                "content": response_content,
                 "timestamp": datetime.now(),
                 "tool_results": tool_results,
-                "model_used": model_name
+                "model_used": model_name,
+                "tool_calls_made": len(tool_calls)
             }
             
         except Exception as e:
-            logger.error(f"Error processing AI query: {e}")
+            logger.error(f"Error processing AI query: {e}", exc_info=True)
             return {
                 "content": f"处理查询时出现错误: {str(e)}",
                 "timestamp": datetime.now(),
@@ -163,27 +214,90 @@ class AIService:
             "test_mode": True
         }
     
-    def _extract_tool_actions(self, response_content: str) -> List[Dict[str, Any]]:
-        """从AI响应中提取工具调用"""
-        # 这里可以实现更复杂的工具调用解析逻辑
-        # 目前返回空列表，后续可以扩展
-        return []
-    
-    async def _execute_tool_action(self, action: Dict[str, Any]) -> Dict[str, Any]:
-        """执行工具操作"""
-        tool_name = action.get("tool")
-        params = action.get("params", {})
-        
+    async def _execute_langchain_tool(self, tool_name: str, tool_args: Dict[str, Any]) -> str:
+        """执行 LangChain 工具"""
         try:
-            if tool_name == "navigate_to_locus":
-                return await self.jbrowse_toolkit.navigate_to_locus(**params)
-            elif tool_name == "get_gene_info":
-                return await self.jbrowse_toolkit.get_gene_info(**params)
-            elif tool_name == "search_variants":
-                return await self.jbrowse_toolkit.search_variants(**params)
+            # 查找工具
+            tool_func = None
+            for tool in self.tools:
+                if tool.name == tool_name:
+                    tool_func = tool
+                    break
+            
+            if tool_func is None:
+                return f"Error: Tool '{tool_name}' not found"
+            
+            # 执行工具（支持异步和同步）
+            if hasattr(tool_func, 'ainvoke'):
+                result = await tool_func.ainvoke(tool_args)
             else:
-                return {"error": f"Unknown tool: {tool_name}"}
-                
+                result = tool_func.invoke(tool_args)
+            
+            return str(result)
+            
         except Exception as e:
-            logger.error(f"Error executing tool {tool_name}: {e}")
-            return {"error": str(e)}
+            logger.error(f"Error executing tool {tool_name}: {e}", exc_info=True)
+            return f"Error executing tool: {str(e)}"
+    
+    async def _send_navigation_command(
+        self,
+        websocket: WebSocket,
+        tool_name: str,
+        tool_args: Dict[str, Any],
+        tool_result: str
+    ):
+        """发送导航指令到前端"""
+        try:
+            # 检查工具是否成功执行
+            if "failed" in tool_result.lower() or "error" in tool_result.lower():
+                logger.warning(f"Tool execution failed, not sending navigation command: {tool_result}")
+                return
+            
+            # 根据工具类型构建导航指令
+            if tool_name == 'navigate_jbrowse':
+                # 直接使用工具参数
+                navigation_data = await self.navigation_tool.navigate_to_location(
+                    chromosome=tool_args.get('chromosome'),
+                    start=tool_args.get('start'),
+                    end=tool_args.get('end'),
+                    genome_format=tool_args.get('genome_format', 'ucsc')
+                )
+            elif tool_name == 'navigate_to_gene':
+                # 通过基因名称获取位置
+                navigation_data = await self.navigation_tool.navigate_by_gene(
+                    gene_name=tool_args.get('gene_name'),
+                    genome_format=tool_args.get('genome_format', 'ucsc')
+                )
+            else:
+                return
+            
+            # 检查导航数据是否成功
+            if navigation_data.get('status') != 'success':
+                logger.warning(f"Navigation data preparation failed: {navigation_data}")
+                return
+            
+            # 构建 WebSocket 消息
+            request_id = str(uuid.uuid4())
+            location = navigation_data['location']
+            
+            navigation_command = {
+                "type": "navigation",
+                "action": "navigate_to_location",
+                "payload": {
+                    "chromosome": location['chromosome'],
+                    "chromosome_ucsc": location['chromosome_ucsc'],
+                    "chromosome_ensembl": location['chromosome_ensembl'],
+                    "start": location['start'],
+                    "end": location['end'],
+                    "gene_name": location.get('gene_name')
+                },
+                "requestId": request_id,
+                "timestamp": datetime.now().isoformat()
+            }
+            
+            # 发送导航指令
+            await websocket.send_text(json.dumps(navigation_command))
+            logger.info(f"Sent navigation command: {request_id}")
+            
+        except Exception as e:
+            logger.error(f"Error sending navigation command: {e}", exc_info=True)

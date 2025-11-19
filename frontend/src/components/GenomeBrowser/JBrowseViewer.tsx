@@ -8,6 +8,9 @@ import { observer } from 'mobx-react'
 import { getGenomeConfig } from '../../config/genomes'
 import CustomJBrowseLinearGenomeView from './CustomJBrowseLinearGenomeView'
 import SidebarModalWidget from './SidebarModalWidget'
+import { exposeNavigationTest } from '../../utils/testJBrowseNavigation'
+import { JBrowseController } from '../../services/jbrowseController'
+import { websocketService } from '../../services/websocket'
 
 export const JBrowseViewer = observer(() => {
   // 使用 useState 来保持 viewState 的稳定性，避免每次渲染都重新创建
@@ -59,6 +62,27 @@ export const JBrowseViewer = observer(() => {
     console.error('Failed to create JBrowse theme:', error)
     theme = createJBrowseTheme()
   }
+
+  // 初始化 JBrowse Controller 并连接到 WebSocket
+  useEffect(() => {
+    // 创建 JBrowse Controller
+    const controller = new JBrowseController(state)
+
+    // 设置到 WebSocket 服务
+    websocketService.setJBrowseController(controller)
+    console.log('✅ JBrowse Controller initialized and connected to WebSocket')
+
+    // 在开发环境中暴露导航测试函数
+    if (process.env.NODE_ENV === 'development') {
+      exposeNavigationTest(state)
+      console.log('🧪 JBrowse navigation test functions are ready!')
+    }
+
+    return () => {
+      // 清理：移除控制器引用
+      websocketService.setJBrowseController(null as any)
+    }
+  }, [state])
 
   // 处理拖动开始
   const handleMouseDown = useCallback(() => {

@@ -120,6 +120,7 @@ export interface ThemeConfig {
  */
 export interface JBrowseConfiguration {
     logoPath: LocationConfig;
+    chromosomeFormat?: 'ucsc' | 'ensembl'; // Chromosome naming convention
     [key: string]: any;
 }
 

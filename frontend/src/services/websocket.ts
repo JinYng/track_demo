@@ -3,6 +3,8 @@
  * 处理与后端的实时通信
  */
 
+import { JBrowseController } from './jbrowseController'
+
 interface ModelConfig {
     apiBaseUrl: string
     apiKey: string
@@ -32,6 +34,33 @@ interface WebSocketResponse {
     data?: any
 }
 
+interface NavigationCommand {
+    type: 'navigation'
+    action: 'navigate_to_location'
+    payload: {
+        chromosome: string
+        chromosome_ucsc: string
+        chromosome_ensembl: string
+        start: number
+        end: number
+        gene_name?: string
+    }
+    requestId: string
+    timestamp: string
+}
+
+interface NavigationResponse {
+    type: 'navigation_response'
+    requestId: string
+    status: 'success' | 'error'
+    message: string
+    location?: {
+        chromosome: string
+        start: number
+        end: number
+    }
+}
+
 export class WebSocketService {
     private ws: WebSocket | null = null
     private reconnectAttempts = 0
@@ -39,6 +68,7 @@ export class WebSocketService {
     private reconnectDelay = 1000
     private messageHandlers: ((response: WebSocketResponse) => void)[] = []
     private connectionHandlers: ((connected: boolean) => void)[] = []
+    private jbrowseController: JBrowseController | null = null
 
     constructor(private url: string = 'ws://localhost:8000/ws') { }
 
@@ -59,8 +89,15 @@ export class WebSocketService {
 
                 this.ws.onmessage = (event) => {
                     try {
-                        const response: WebSocketResponse = JSON.parse(event.data)
-                        this.notifyMessageHandlers(response)
+                        const response = JSON.parse(event.data)
+
+                        // 检查是否是导航指令
+                        if (response.type === 'navigation') {
+                            this.handleNavigationCommand(response as NavigationCommand)
+                        } else {
+                            // 普通消息，通知处理器
+                            this.notifyMessageHandlers(response as WebSocketResponse)
+                        }
                     } catch (error) {
                         console.error('解析WebSocket消息失败:', error)
                     }
@@ -217,6 +254,91 @@ export class WebSocketService {
                 console.error('连接状态处理器执行失败:', error)
             }
         })
+    }
+
+    /**
+     * 设置 JBrowse 控制器
+     */
+    setJBrowseController(controller: JBrowseController) {
+        this.jbrowseController = controller
+        console.log('✅ JBrowse controller set in WebSocket service')
+    }
+
+    /**
+     * 处理导航指令
+     */
+    private async handleNavigationCommand(command: NavigationCommand) {
+        console.log('📍 Received navigation command:', command)
+
+        if (!this.jbrowseController) {
+            console.error('❌ JBrowse controller not initialized')
+            this.sendNavigationResponse(command.requestId, 'error',
+                'JBrowse controller not initialized')
+            return
+        }
+
+        try {
+            // 执行导航
+            const result = await this.jbrowseController.navigateToLocation(
+                command.payload.chromosome,
+                command.payload.start,
+                command.payload.end
+            )
+
+            if (result.success) {
+                console.log('✅ Navigation successful:', result)
+                this.sendNavigationResponse(
+                    command.requestId,
+                    'success',
+                    result.message,
+                    result.location
+                )
+            } else {
+                console.error('❌ Navigation failed:', result)
+                this.sendNavigationResponse(
+                    command.requestId,
+                    'error',
+                    result.message || 'Navigation failed'
+                )
+            }
+        } catch (error: any) {
+            console.error('❌ Navigation error:', error)
+            this.sendNavigationResponse(
+                command.requestId,
+                'error',
+                `Navigation failed: ${error.message}`
+            )
+        }
+    }
+
+    /**
+     * 发送导航响应
+     */
+    private sendNavigationResponse(
+        requestId: string,
+        status: 'success' | 'error',
+        message: string,
+        location?: { chromosome: string; start: number; end: number }
+    ) {
+        if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+            console.error('❌ Cannot send navigation response: WebSocket not connected')
+            return
+        }
+
+        const response: NavigationResponse = {
+            type: 'navigation_response',
+            requestId,
+            status,
+            message,
+            location
+        }
+
+        try {
+            this.ws.send(JSON.stringify(response))
+            console.log('📤 Sent navigation response:', response)
+        } catch (error) {
+            console.error('❌ Failed to send navigation response:', error)
+        }
     }
 }
 

@@ -86,6 +86,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 await handle_connection_test(websocket, message_data)
             elif message_data.get("type") == "ai_query" or message_data.get("query"):
                 await handle_ai_query(websocket, message_data)
+            elif message_data.get("type") == "navigation_response":
+                await handle_navigation_response(websocket, message_data)
             
     except WebSocketDisconnect:
         websocket_manager.disconnect(websocket)
@@ -100,8 +102,8 @@ async def handle_ai_query(websocket: WebSocket, message_data: dict):
         query = message_data.get("query", "")
         ai_model_config = message_data.get("ai_model_config", {})
         
-        # 使用AI服务处理查询
-        response = await ai_service.process_query(query, ai_model_config)
+        # 使用AI服务处理查询，传递 websocket 以支持导航指令
+        response = await ai_service.process_query(query, ai_model_config, websocket=websocket)
         
         # 发送响应 - 处理datetime序列化
         response_data = {
@@ -124,6 +126,21 @@ async def handle_ai_query(websocket: WebSocket, message_data: dict):
             "type": "error",
             "message": f"处理查询时出错: {str(e)}"
         }))
+
+async def handle_navigation_response(websocket: WebSocket, message_data: dict):
+    """处理前端导航响应"""
+    try:
+        request_id = message_data.get("requestId", "")
+        status = message_data.get("status", "")
+        message = message_data.get("message", "")
+        
+        logger.info(f"Navigation response received: {request_id} - {status} - {message}")
+        
+        # 这里可以记录导航历史或执行其他操作
+        # 目前只记录日志
+        
+    except Exception as e:
+        logger.error(f"Error handling navigation response: {e}")
 
 async def handle_connection_test(websocket: WebSocket, message_data: dict):
     """处理连接测试"""

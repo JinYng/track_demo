@@ -21,6 +21,7 @@ const hg38UcscConfig: Omit<GenomeConfig, 'theme'> = {
             uri: '',
             locationType: 'UriLocation',
         },
+        chromosomeFormat: 'ucsc', // UCSC data uses chr prefix (chr1, chr2, chrX)
     },
     defaultSession,
 };

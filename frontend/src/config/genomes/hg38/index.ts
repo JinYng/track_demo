@@ -19,6 +19,7 @@ const hg38Config: Omit<GenomeConfig, 'theme'> = {
             uri: '',
             locationType: 'UriLocation',
         },
+        chromosomeFormat: 'ensembl', // JBrowse demo data uses Ensembl format (1, 2, X)
     },
     defaultSession,
 };
