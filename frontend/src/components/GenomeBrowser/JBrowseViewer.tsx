@@ -5,14 +5,30 @@ import { readConfObject } from '@jbrowse/core/configuration'
 import { createJBrowseTheme } from '@jbrowse/core/ui'
 import { Box, ThemeProvider } from '@mui/material'
 import { observer } from 'mobx-react'
-import { getDefaultGenomeConfig } from '../../config/genomes'
+import { getGenomeConfig } from '../../config/genomes'
 import CustomJBrowseLinearGenomeView from './CustomJBrowseLinearGenomeView'
 import SidebarModalWidget from './SidebarModalWidget'
 
 export const JBrowseViewer = observer(() => {
   // 使用 useState 来保持 viewState 的稳定性，避免每次渲染都重新创建
   const [state] = useState(() => {
-    const viewConfig = getDefaultGenomeConfig()
+    // 尝试从 sessionStorage 读取 referenceGenome，如果没有则使用默认的 hg38
+    let genomeId = 'hg38'
+    try {
+      const sessionId = window.location.pathname.split('/').pop()
+      if (sessionId) {
+        const savedConfig = sessionStorage.getItem(`session_${sessionId}`)
+        if (savedConfig) {
+          const parsed = JSON.parse(savedConfig)
+          genomeId = parsed.referenceGenome || 'hg38'
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load genome ID from session:', error)
+    }
+
+    // 根据 genomeId 加载对应的配置
+    const viewConfig = getGenomeConfig(genomeId)
     return createViewState({
       assembly: viewConfig.assembly,
       tracks: viewConfig.tracks,

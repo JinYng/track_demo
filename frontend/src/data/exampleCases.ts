@@ -27,6 +27,18 @@ export const EXAMPLE_CASES: AnalysisCase[] = [
         targetPosition: 'chr10:29838565-29838850',
         description: 'Complete demonstration of genome browser features with 5 pre-loaded tracks: reference sequence, gene annotations, conservation scores, variants, and alignments',
     },
+    /**
+     * UCSC data demo with new tracks
+     * Showcases ENCODE, GTEx, ClinVar, and CADD tracks
+     */
+    {
+        id: 'demo-hg38-ucsc',
+        title: 'UCSC Tracks Demo (hg38)',
+        speciesName: 'Human',
+        assemblyId: 'hg38-ucsc',
+        targetPosition: 'chr7:155799529-155812871',
+        description: 'UCSC data sources demo: RefSeq genes, phyloP conservation, CADD scores, ClinVar variants, ENCODE TF binding, and GTEx eQTLs',
+    },
     {
         id: 'case-wes-variant',
         title: 'Patient A WES Variant Screening',

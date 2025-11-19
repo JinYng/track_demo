@@ -4,9 +4,9 @@
 
 ## 项目状态
 
-**当前版本**: v1.0.0-beta  
-**开发状态**: 🟢 核心功能已完成，架构优化完毕  
-**最后更新**: 2025-10-16
+**当前版本**: v1.1.0-dev  
+**开发状态**: � 后端功能扩展开，发中  
+**最后更新**: 2025-11-18
 
 ## 核心特性
 
@@ -54,6 +54,27 @@
 - Python >= 3.9
 - Conda (推荐)
 
+### 安装依赖
+
+#### 后端依赖
+
+```bash
+# 激活conda环境
+conda activate gene
+
+# 安装Python依赖
+cd backend
+pip install -r requirements.txt
+```
+
+#### 前端依赖
+
+```bash
+# 安装Node.js依赖
+cd frontend
+npm install
+```
+
 ### 启动应用
 
 #### 1. 启动后端服务
@@ -62,25 +83,29 @@
 # 激活conda环境
 conda activate gene
 
-# 启动后端
+# 启动后端开发服务器
 cd backend
 python start_dev.py
 ```
 
+后端服务将在 `http://localhost:8000` 启动
+
 #### 2. 启动前端应用
 
 ```bash
-# 启动前端
+# 启动前端开发服务器
 cd frontend
-npm install  # 首次运行
 npm run dev
 ```
+
+前端应用将在 `http://localhost:5173` 启动
 
 ### 访问应用
 
 - **前端界面**: http://localhost:5173
 - **后端 API**: http://localhost:8000
 - **API 文档**: http://localhost:8000/docs
+- **WebSocket**: ws://localhost:8000/ws
 
 ## 使用指南
 
@@ -302,21 +327,28 @@ ai-genomics-assistant/
 
 ### 🚧 **开发中功能**
 
-#### 智能分析工具 (30%)
+#### 后端服务扩展 (进行中)
 
-- 🔄 基因信息查询 API
-- 🔄 JBrowse 控制工具集
-- 🔄 基因组数据分析功能
+- 🔄 新的后端功能模块开发
+- 🔄 API 接口扩展和优化
+- 🔄 数据处理服务增强
+- � 业务逻辑和层重构
+
+#### 智能分析工具 (规划中)
+
+- 📋 基因信息查询 API
+- 📋 JBrowse 控制工具集
+- 📋 基因组数据分析功能
 - 📋 变异注释和解释
 
-#### 高级功能 (10%)
+#### 高级功能 (规划中)
 
 - 📋 用户会话管理
 - 📋 数据上传和处理
 - 📋 批量分析功能
 - 📋 结果导出和分享
 
-### 📋 **计划功能**
+### 📋 **未来计划**
 
 #### 系统优化
 

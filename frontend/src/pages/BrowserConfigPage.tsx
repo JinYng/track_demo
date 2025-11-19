@@ -46,6 +46,7 @@ export default function BrowserConfigPage() {
   const getOrganismFromAssembly = (assemblyId: string): string => {
     const assemblyMap: Record<string, string> = {
       hg38: 'Human',
+      'hg38-ucsc': 'Human',
       hg19: 'Human',
       mm10: 'Mouse',
       mm9: 'Mouse',
@@ -233,7 +234,8 @@ export default function BrowserConfigPage() {
                   cursor: 'pointer',
                 }}
               >
-                <option value="hg38">Human (hg38)</option>
+                <option value="hg38">Human (hg38) - JBrowse Demo</option>
+                <option value="hg38-ucsc">Human (hg38) - UCSC Tracks</option>
                 <option value="hg19">Human (hg19)</option>
                 <option value="mm10">Mouse (mm10)</option>
                 <option value="mm9">Mouse (mm9)</option>

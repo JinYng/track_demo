@@ -3,6 +3,7 @@
 
 import { GenomeConfig, GenomeMetadata } from './types';
 import hg38Config from './hg38';
+import hg38UcscConfig from './hg38-ucsc';
 import jbrowseTheme from './theme';
 
 /**
@@ -13,8 +14,14 @@ export const availableGenomes: GenomeMetadata[] = [
     {
         id: 'hg38',
         name: 'Human (GRCh38/hg38)',
-        description: 'Human genome assembly GRCh38 (hg38)',
+        description: 'Human genome assembly GRCh38 (hg38) - JBrowse demo data',
         defaultLocation: '10:29,838,565..29,838,850',
+    },
+    {
+        id: 'hg38-ucsc',
+        name: 'Human (GRCh38/hg38) - UCSC',
+        description: 'Human genome assembly GRCh38 (hg38) - UCSC data sources',
+        defaultLocation: 'chr7:155,799,529..155,812,871',
     },
     // Future genomes can be added here:
     // {
@@ -31,6 +38,7 @@ export const availableGenomes: GenomeMetadata[] = [
  */
 const genomeConfigs: Record<string, () => Omit<GenomeConfig, 'theme'>> = {
     hg38: () => hg38Config,
+    'hg38-ucsc': () => hg38UcscConfig,
     // Future genomes can be added here:
     // hg19: () => hg19Config,
 };
